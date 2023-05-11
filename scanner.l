@@ -1,18 +1,18 @@
 %{
 #include<stdio.h>
-#include"y.tab.h"
+#include"y.tab.hpp"
 #include"symbolTable.hpp"
 
 #define LIST     strcat(buf,yytext)
 //#define token(t) {LIST; printf("<%s>\n",#t);}
-#define token(t) {LIST; printf("<%s>\n",t); return(t);}
+#define token(t) {LIST; printf("<%s>\n",#t); return t;}
 
 //#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",#t,i);}
-#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",#t,i); return(t)}
+#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",#t,i); return t;}
 
 
 //#define tokenString(t,s) {LIST; printf("<%s:%s>\n",#t,s);}
-#define tokenString(t,s) {LIST; printf("<%s:%s>\n",#t,s); return(t);}
+#define tokenString(t,s) {LIST; printf("<%s:%s>\n",#t,s); return t;}
 // #define yyDebug(s) printf("%s",s);
 
 #define MAX_LINE_LENG 256
@@ -67,7 +67,7 @@ ID {alphaBat}+({digits}|{alphaBat})*
 
 
         /*==========KeyWord==========*/
-begin           {token(BEGIN);}
+begin           {token(BEG);}
 array           {token(ARRAY);}
 bool            {token(BOOL);}
 char            {token(CHAR);}
@@ -101,8 +101,8 @@ when            {token(WHEN);}
 
         /*==========Identity==========*/
 {ID}            {
-                token("ID");
-                printf("id %s\n",yytext);
+                token(ID);
+                // printf("id %s\n",yytext);
                 s_table.insert(yytext);
                 }
 
@@ -257,22 +257,22 @@ when            {token(WHEN);}
 
 
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s filename\n", argv[0]);
-        return 1;
-    }
+        /* int main(int argc, char *argv[]) {
+        if (argc < 2) {
+                fprintf(stderr, "Usage: %s filename\n", argv[0]);
+                return 1;
+        }
 
-    FILE *file = fopen(argv[1], "r");
-    if (!file) {
-        perror("Error opening file");
-        return 1;
-    }
-        s_table.creat();        
-    yyin = file;
-    yylex(); 
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+                perror("Error opening file");
+                return 1;
+        }
+                s_table.creat();        
+        yyin = file;
+        yylex(); 
 
-    fclose(file); 
-    s_table.dump();
-    return 0;
-}
+        fclose(file); 
+        s_table.dump();
+        return 0;
+        } */

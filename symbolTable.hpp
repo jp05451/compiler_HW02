@@ -9,7 +9,7 @@ using namespace std;
 
 enum symbolType
 {
-    ID = 0
+    id = 0
 };
 
 class symbolTable
@@ -38,17 +38,17 @@ void symbolTable::creat()
 
 int symbolTable::lookup(const string &symbol)
 {
-    // vector<string>::iterator iter = find(table[ID].begin(), table[ID].end(), symbol);
-    set<string>::iterator iter = find(table[ID].begin(), table[ID].end(), symbol);
-    if (iter == table[ID].end())
+    // vector<string>::iterator iter = find(table[id].begin(), table[id].end(), symbol);
+    set<string>::iterator iter = find(table[id].begin(), table[id].end(), symbol);
+    if (iter == table[id].end())
         return -1;
 
-    return distance(table[ID].begin(), iter);
+    return distance(table[id].begin(), iter);
 }
 
 void symbolTable::insert(const string &symbol)
 {
-    table[ID].insert(symbol);
+    table[id].insert(symbol);
     cout << symbol << " is inserted" << endl;
 }
 
@@ -56,7 +56,7 @@ void symbolTable::dump()
 {
     cout << "Symbol Table:" << endl;
     // cout << "ID" << endl;
-    for (auto &a : table[ID])
+    for (auto &a : table[id])
     {
         cout << a << endl;
     }

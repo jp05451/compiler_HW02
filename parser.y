@@ -1,10 +1,15 @@
 %{
+#include "lex.yy.cpp"
+// #include "symbolTable.hpp"
+
 #define Trace(t)        printf(t)
+// int yylex();
+void yyerror(char *);
 %}
 
 /* tokens */
-%token SEMICOLON ARRAY BEGIN BOOL CHAR CONST DECREASING DEFAULT DO ELSE END EXIT FALSE FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN TRUE VAR WHEN ID
-%token MOD ASSIGN SMALLER_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT
+%token ID ARRAY BEG BOOL CHAR CONST DECREASING DEFAULT DO ELSE END EXIT FALSE FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN TRUE VAR WHEN 
+%token MOD ASSIGN SMALLER_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT NUMBER STR
 
 
 
@@ -31,10 +36,10 @@ array:          ARRAY ID ':' REAL '.''.' REAL OF type
 
 
 declarations:   declarations declarations
+                |declarations
                 |variable
                 |constants
                 |function
-                |
                 ;
 
 statments:      statments statments
@@ -70,10 +75,10 @@ statment:       block
                 |loop
                 ;
 
-block:          BEGIN content END;
+block:          BEG content END;
 
 simple:         ID ASSIGN expression
-                |PUT    expression
+                |PUT  '(' expression ')'
                 |GET ID
                 |RETURN
                 |RESULT expression
@@ -141,15 +146,13 @@ procedure_invacation:   ID '(' functionInputA functionInputB ')'
 
 
 %%
-#include "lex.yy.c"
 
-yyerror(msg)
-char *msg;
+void yyerror(char *msg)
 {
     fprintf(stderr, "%s\n", msg);
 }
 
-main()
+int main(int argc,char **argv)
 {
     /* open the source program file */
     if (argc != 2) {
