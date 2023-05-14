@@ -59,6 +59,9 @@ type:           BOOL
 function:       FUNCTION ID '(' ')' ':' types
                 contents
                 END ID
+                |FUNCTION ID '(' functionVarA ')' ':' types
+                contents
+                END ID
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' types
                 contents
                 END ID
@@ -70,10 +73,12 @@ functionVarA:   ID ':' type
 
 functionVarB:   functionVarB functionVarB
                 |',' ID ':' type
-                |
                 ;
 
 procedure:      PROCEDURE ID '(' ')'
+                contents
+                END ID
+                |PROCEDURE ID '(' functionVarA ')'
                 contents
                 END ID
                 |PROCEDURE ID '(' functionVarA functionVarB ')'
@@ -82,7 +87,6 @@ procedure:      PROCEDURE ID '(' ')'
                 ;
 
 contents:       contents content
-                |
                 ;
 
 content:        variable
@@ -101,7 +105,6 @@ statment:       blocks
                 ;
 
 blocks:         blocks block
-                |
                 ;
 block:          BEG
                 content
@@ -155,7 +158,6 @@ functionInputA:     expressions
                     ;
 functionInputB:     functionInputB functionInputB
                     |',' expressions
-                    |
                     ;
 
 conditional:    IF bool_expression THEN

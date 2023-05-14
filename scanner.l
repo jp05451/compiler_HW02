@@ -186,7 +186,7 @@ when            {token(WHEN);}
                 // yytext[yyleng-1]='\0';
                 // strcpy(yytext,strTemp);
                 // yytext=strTemp;
-                tokenString(STRING,strTemp);
+                tokenString(STR,strTemp);
                 // strTemp[0]='\0';
                 yytext=strTemp;
                 LIST;
