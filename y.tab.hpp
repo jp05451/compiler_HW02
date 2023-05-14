@@ -78,14 +78,15 @@ extern int yydebug;
     WHEN = 288,
     MOD = 289,
     ASSIGN = 290,
-    SMALLER_EQUAL = 291,
+    LESS_EQUAL = 291,
     MORE_EQUAL = 292,
     NOT_EQUAL = 293,
     AND = 294,
     OR = 295,
     NOT = 296,
-    NUMBER = 297,
-    STR = 298
+    STR = 297,
+    INT_NUMBER = 298,
+    REAL_NUMBER = 299
   };
 #endif
 /* Tokens.  */
@@ -122,14 +123,15 @@ extern int yydebug;
 #define WHEN 288
 #define MOD 289
 #define ASSIGN 290
-#define SMALLER_EQUAL 291
+#define LESS_EQUAL 291
 #define MORE_EQUAL 292
 #define NOT_EQUAL 293
 #define AND 294
 #define OR 295
 #define NOT 296
-#define NUMBER 297
-#define STR 298
+#define STR 297
+#define INT_NUMBER 298
+#define REAL_NUMBER 299
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

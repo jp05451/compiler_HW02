@@ -26,6 +26,7 @@ symbolTable s_table;
 digit [0-9]
 digits {digit}+
 numerical {digits}+("."{digits}+)?
+integer {digits}+
 
 alphaBat [a-zA-Z]
 ID {alphaBat}+({digits}|{alphaBat})*
@@ -56,7 +57,7 @@ ID {alphaBat}+({digits}|{alphaBat})*
 "mod"   {token(MOD);}
 ":="    {token(ASSIGN);}
 "<"     {token('<');}
-"<="    {token(SMALLER_EQUAL);}
+"<="    {token(LESS_EQUAL);}
 ">"     {token('>');}
 ">="    {token(MORE_EQUAL);}
 "="     {token('=');}
@@ -109,8 +110,14 @@ when            {token(WHEN);}
 {numerical}     {
                 float number;
                 sscanf(yytext,"%f",&number);
-                tokenInteger(NUMBER,number);
+                tokenInteger(REAL_NUMBER,number);
                 }
+
+{integer}       {
+                int number;
+                sscanf(yytext,"%d",&number);
+                tokenInteger(INT_NUMBER,number);
+}
 
         /*==========STRING==========*/
 
@@ -179,7 +186,7 @@ when            {token(WHEN);}
                 // yytext[yyleng-1]='\0';
                 // strcpy(yytext,strTemp);
                 // yytext=strTemp;
-                tokenString(STR,strTemp);
+                tokenString(STRING,strTemp);
                 // strTemp[0]='\0';
                 yytext=strTemp;
                 LIST;

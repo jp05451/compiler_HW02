@@ -8,142 +8,174 @@ void yyerror(char *);
 %}
 
 /* tokens */
+
+
 %token ID ARRAY BEG BOOL CHAR CONST DECREASING DEFAULT DO ELSE END EXIT FALSE FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN TRUE VAR WHEN 
-%token MOD ASSIGN SMALLER_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT NUMBER STR
+%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  STR INT_NUMBER REAL_NUMBER
 
 
 
 %%
-program:        declarations statments;
-constants:       CONST ID ':' type ASSIGN constant_exp
-                |CONST ID ASSIGN constant_exp
 
-variable:       VAR ID ':' type ASSIGN constant_exp
-                |VAR ID ':'type
-                |VAR ID ASSIGN constant_exp
+program:        declarations statments;
+
+declarations:   declarations declaration
+                |
+                ;
+
+statments:      statments statment
+                |
+                ;
+
+declaration:    constant
+                |variable
+                |array
+                |function
+                |procedure
+                ;
+
+constant:       CONST ID ':' type ASSIGN const_exp
+                |CONST ID ASSIGN const_exp
+                ;
+
+variable:       VAR ID ':' type
+                |VAR ID ASSIGN const_exp
+                |VAR ID ':' type ASSIGN const_exp
+                ;
+
+types:          type
+                |array
+                ;
+
+array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF type
+                ;
 
 type:           BOOL
                 |INT
                 |REAL
-
-constant_exp:   STRING
-                |REAL
-                |'-'REAL
-                |TRUE
-                |FALSE
-
-array:          ARRAY ID ':' REAL '.''.' REAL OF type
-
-
-declarations:   declarations declarations
-                |declarations
-                |variable
-                |constants
-                |function
+                |STRING
                 ;
 
-statments:      statments statments
-                |statment
-                |
+function:       FUNCTION ID '(' ')' ':' types
+                contents
+                END ID
+                |FUNCTION ID '(' functionVarA functionVarB ')' ':' types
+                contents
+                END ID
                 ;
-
-function:       FUNCTION ID '('functionVarA functionVarB ')' ':' type content END ID;
 
 functionVarA:   ID ':' type
+                |array
+                ;
+
+functionVarB:   functionVarB functionVarB
+                |',' ID ':' type
                 |
                 ;
-functionVarB:   ',' ID ':' type
-                |functionVarB functionVarB
+
+procedure:      PROCEDURE ID '(' ')'
+                contents
+                END ID
+                |PROCEDURE ID '(' functionVarA functionVarB ')'
+                contents
+                END ID
+                ;
+
+contents:       contents content
                 |
                 ;
-content:        content content
-                |variable
-                |constants
+
+content:        variable
+                |constant
+                |array
                 |statments
-                |
                 ;
 
-procedure:      ID '(' functionVarA functionVarB ')' content
-
-
-statment:       block
+statment:       blocks
                 |simple
+                |expressions
                 |function_invocation
                 |procedure_invacation
-                |expression
                 |conditional
                 |loop
                 ;
 
-block:          BEG content END;
+blocks:         blocks block
+                |
+                ;
+block:          BEG
+                content
+                END
+                ;
 
-simple:         ID ASSIGN expression
-                |PUT  '(' expression ')'
-                |GET ID
+simple:         ID ASSIGN expressions
+                |PUT expressions
+                |GET expressions
+                |RESULT expressions
                 |RETURN
-                |RESULT expression
+                |EXIT
                 |EXIT WHEN bool_expression
                 |SKIP
+                ;
 
-expression:     expression '+' expression
-                |expression '-' expression
-                |expression '*' expression
-                |expression '/' expression
+expressions:    '-' expressions
+                |'(' expressions ')'
+                |expressions '*' expressions
+                |expressions '/' expressions
+                |expressions MOD expressions
+                |expressions '+' expressions
+                |expressions '-' expressions
                 |bool_expression
-                |ID
-                |ARRAY '[' INT ']'
-                |constant_exp
+                |const_exp
+                |ID '[' INT ']'
                 ;
-
-bool_expression: expression '<' expression
-                |expression '>' expression
-                |expression SMALLER_EQUAL expression
-                |expression MORE_EQUAL expression
-                |expression '=' expression
-                |expression 'NOT_EQUAL' expression
-                |expression NOT expression
-                |expression AND expression
-                |expression OR expression
+const_exp:      INT_NUMBER
+                |REAL_NUMBER
+                |STR
+                |TRUE
+                |FALSE
                 ;
-
-function_invocation: ID '(' functionInputA functionInputB ')'
-                    |ID
+bool_expression:    expressions '<' expressions
+                    |expressions LESS_EQUAL expressions
+                    |expressions '=' expressions
+                    |expressions MORE_EQUAL expressions
+                    |expressions '>' expressions
+                    |expressions NOT_EQUAL expressions
+                    |expressions NOT expressions
+                    |expressions AND expressions
+                    expressions OR expressions
+                    ;
+function_invocation:    ID '(' ')'
+                        |ID '(' functionInputA functionInputB ')'
+                        ;
+procedure_invacation:   ID '(' ')'
+                        |ID '(' functionInputA functionInputB ')'
+                        ;
+functionInputA:     expressions
+                    ;
+functionInputB:     functionInputB functionInputB
+                    |',' expressions
+                    |
                     ;
 
-functionInputA: expression;
-functionInputB: ',' expression;
-
-conditional:    IF bool_expression THEN 
-                content
-                ELSE 
+conditional:    IF bool_expression THEN
+                contents
+                ELSE
                 content
                 END IF
                 |IF bool_expression THEN
-                content
+                contents
                 END IF
-                ;
 
 loop:           LOOP
-                content
+                contents
                 END LOOP
-                |FOR ID ':' const_exp '.''.' constant_exp
-                content
-                END FOR
-                |FOR DECREASING ID ':' const_exp '.''.' constant_exp
-                content
-                END FOR
-                ;
-const_exp:      INT
-                |ID
-                ;
-
-procedure_invacation:   ID '(' functionInputA functionInputB ')'
-                        |ID
-                        ;
-
-
-
-
+                |FOR ID const_exp '.' '.' const_exp
+                contents
+                END LOOP
+                |FOR DECREASING ID const_exp '.' '.' const_exp
+                contents
+                END LOOP
 
 %%
 
