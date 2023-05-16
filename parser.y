@@ -11,9 +11,15 @@ void yyerror(char *);
 
 
 %token ID ARRAY BEG BOOL CHAR CONST DECREASING DEFAULT DO ELSE END EXIT FALSE FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN TRUE VAR WHEN 
-%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  STR INT_NUMBER REAL_NUMBER
+%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  STR INT_NUMBER REAL_NUMBER NEGATIVE
 
-
+%left OR
+%left AND
+%left NOT
+%left '<' LESS_EQUAL '=' MORE_EQUAL '>' NOT_EQUAL
+%left '+' '-'
+%left '*' '/' MOD
+%nonassoc NEGATIVE
 
 %%
 
@@ -59,26 +65,22 @@ type:           BOOL
 function:       FUNCTION ID '(' ')' ':' types
                 contents
                 END ID
-                |FUNCTION ID '(' functionVarA ')' ':' types
-                contents
-                END ID
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' types
                 contents
                 END ID
                 ;
 
+
+
 functionVarA:   ID ':' type
                 |array
                 ;
 
-functionVarB:   functionVarB functionVarB
-                |',' ID ':' type
+functionVarB:   functionVarB ',' ID ':' type
+                |
                 ;
 
 procedure:      PROCEDURE ID '(' ')'
-                contents
-                END ID
-                |PROCEDURE ID '(' functionVarA ')'
                 contents
                 END ID
                 |PROCEDURE ID '(' functionVarA functionVarB ')'
@@ -87,25 +89,26 @@ procedure:      PROCEDURE ID '(' ')'
                 ;
 
 contents:       contents content
+                |
                 ;
 
 content:        variable
                 |constant
                 |array
-                |statments
+                |statment
                 ;
 
-statment:       blocks
+statment:       block
                 |simple
                 |expressions
                 |function_invocation
-                |procedure_invacation
                 |conditional
                 |loop
                 ;
 
-blocks:         blocks block
-                ;
+/* blocks:         blocks block
+                |
+                ; */
 block:          BEG
                 content
                 END
@@ -121,7 +124,7 @@ simple:         ID ASSIGN expressions
                 |SKIP
                 ;
 
-expressions:    '-' expressions
+expressions:    NEGATIVE expressions
                 |'(' expressions ')'
                 |expressions '*' expressions
                 |expressions '/' expressions
@@ -146,18 +149,18 @@ bool_expression:    expressions '<' expressions
                     |expressions NOT_EQUAL expressions
                     |expressions NOT expressions
                     |expressions AND expressions
-                    expressions OR expressions
+                    |expressions OR expressions
                     ;
-function_invocation:    ID '(' ')'
+function_invocation:    ID '(' ')' 
                         |ID '(' functionInputA functionInputB ')'
                         ;
-procedure_invacation:   ID '(' ')'
-                        |ID '(' functionInputA functionInputB ')'
-                        ;
+    /* procedure_invacation:   ID '(' ')'
+                            |ID '(' functionInputA functionInputB ')'
+                            ; */
 functionInputA:     expressions
                     ;
-functionInputB:     functionInputB functionInputB
-                    |',' expressions
+functionInputB:     functionInputB ',' expressions
+                    |
                     ;
 
 conditional:    IF bool_expression THEN

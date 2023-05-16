@@ -86,7 +86,8 @@ extern int yydebug;
     NOT = 296,
     STR = 297,
     INT_NUMBER = 298,
-    REAL_NUMBER = 299
+    REAL_NUMBER = 299,
+    NEGATIVE = 300
   };
 #endif
 /* Tokens.  */
@@ -132,6 +133,7 @@ extern int yydebug;
 #define STR 297
 #define INT_NUMBER 298
 #define REAL_NUMBER 299
+#define NEGATIVE 300
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
