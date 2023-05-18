@@ -71,7 +71,7 @@ ID {alphaBat}+({digits}|{alphaBat})*
         /*==========KeyWord==========*/
 begin           {token(BEG);}
 array           {token(ARRAY);}
-bool            {token(BOOL);}
+bool            {token(BOOL);yylval.type=type_bool;}
 char            {token(CHAR);}
 const           {token(CONST);yylval.constant=1;}
 decreasing      {token(DECREASING);}
