@@ -12,20 +12,22 @@ void yyerror(char *);
 
 %union { 
     //value
-    double doubleVal; 
+    double realVal; 
     int intVal;
-    char* string;
+    char* stringVal;
     int boolVal;
     //type
-    char type;
+    int type;
     int constant;
     //identity
     char* identity;
 }
 
-%token <doubleVal> REAL_NUMBER 
+%token <realVal> REAL_NUMBER 
 %token <intVal> INT_NUMBER
-%token <string> STR
+%token <stringVal> STR
+%token <boolVal> TRUE
+%token <boolVal> FALSE
 /* tokens */
 
 
@@ -40,7 +42,7 @@ void yyerror(char *);
 %left '*' '/' MOD
 %nonassoc NEGATIVE
 
-%type <doubleVal> expressions
+%type <realVal> expressions
 %type <intVal> bool_expression
 %type <type> types
 %type <identity> ID

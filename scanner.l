@@ -103,21 +103,22 @@ when            {token(WHEN);}
         /*==========Identity==========*/
 {ID}            {
                 token(ID);
-                // printf("id %s\n",yytext);
                 s_table.insert(yytext);
                 }
 
+{integer}       {
+                int intNumber;
+                sscanf(yytext,"%d",&intNumber);
+                yylval.intVal=intNumber;
+                tokenInteger(INT_NUMBER,intNumber);
+}
 {numerical}     {
-                float number;
-                sscanf(yytext,"%f",&number);
-                tokenInteger(REAL_NUMBER,number);
+                double doubleNumber;
+                sscanf(yytext,"%f",&doubleNumber);
+                yylval.realVal=doubleNumber;
+                tokenInteger(REAL_NUMBER,doubleNumber);
                 }
 
-{integer}       {
-                int number;
-                sscanf(yytext,"%d",&number);
-                tokenInteger(INT_NUMBER,number);
-}
 
         /*==========STRING==========*/
 
@@ -138,21 +139,7 @@ when            {token(WHEN);}
                 tokenString(STR,strTemp);
                 }
 
-<STRING>[^\"]*          {
-                        // printf("TEST:%d\n",yyleng);
-                        // for(int i=0;i<=yyleng;i++)
-                        // {
-                        // if(yytext[i]!='\0')
-                        //         putchar(yytext[i]);
-                        // else
-                        //         printf("|NULL|");
-                        // }
-                        // puts("");
-                        // yymore();
-                        
-                        strcat(strTemp,yytext);
-                        // puts(strTemp);
-                        }
+<STRING>[^\"]*          {strcat(strTemp,yytext);}
 
 
         /*==========COMMENT==========*/
@@ -174,7 +161,7 @@ when            {token(WHEN);}
         BEGIN(COMMENT_LINES);
         }
 
-<COMMENT_LINES>"%}"        {
+<COMMENT_LINES>"%}"     {
                         LIST;
                         BEGIN(INITIAL);
                         }
