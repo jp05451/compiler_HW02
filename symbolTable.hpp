@@ -7,6 +7,7 @@
 
 using namespace std;
 
+enum dataType{type_int,type_real,type_string,type_bool,type_array,type_function};
 enum symbolType
 {
     TYPE,VALUE
