@@ -127,17 +127,7 @@ when            {token(WHEN);}
                         BEGIN(STRING);
                 }
 
-        /* <STRING>\n      {
-                // printf("next line\n");
-                // strcpy(yytext,strTemp);
-                // yytext=strTemp;
-                // puts(yytext);
-                // LIST;
-                strcat(buf,strTemp);
-                // strcat(buf,"\"");
-                printf("%d: %s", linenum++, buf);
-                buf[0] = '\0';
-                }  */
+<STRING>\n      {printf("Bad Charactor\n");} 
 
 
 
