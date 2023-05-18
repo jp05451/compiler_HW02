@@ -17,7 +17,7 @@ symbolTable s_table;
     //value
     double realVal; 
     int intVal;
-    char* stringVal;
+    char stringVal[256];
     int boolVal;
     //type
     int type;

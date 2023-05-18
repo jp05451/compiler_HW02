@@ -104,11 +104,8 @@ when            {token(WHEN);}
         /*==========Identity==========*/
 {ID}            {
                 strcpy(yylval.identity,yytext);
-                // yylval.identity="ID";
-                printf(yylval.identity);
-                puts("");
+                printf("ID: %s\n",yylval.identity);
                 token(ID);
-                // s_table.insert(yytext);
                 }
 
 {integer}       {
@@ -127,9 +124,12 @@ when            {token(WHEN);}
 
         /*==========STRING==========*/
 
-\"                      {BEGIN(STRING_STATE);}
+\"                      {
+                                strcat(buf,"\"");
+                                BEGIN(STRING_STATE);
+                        }
 
-<STRING_STATE>\n        {printf("Bad Charactor\n");} 
+<STRING_STATE>\n        {printf("Bad Charactor\n");linenum++;} 
 
 
 
@@ -138,10 +138,12 @@ when            {token(WHEN);}
 
 <STRING_STATE>\"        {
                         yytext=strTemp;
+                        // strcpy(yytext,strTemp);
                         BEGIN(INITIAL);
+                        strcpy(yylval.stringVal,strTemp);
                         tokenString(STR,strTemp);
-                        LIST;
-                        strcat(buf,"\"");
+                        // LIST;
+                        // strcat(buf,"\"");
                         }
 
 <STRING_STATE>[^\"]*    {strcat(strTemp,yytext);}
