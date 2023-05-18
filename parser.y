@@ -8,7 +8,7 @@
 #define Trace(t)        printf(t)
 // int yylex();
 void yyerror(char *);
-symbolTable s_table;
+symbolTable globalTable;
 %}
 
 
@@ -237,5 +237,5 @@ int main(int argc,char **argv)
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
-    s_table.dump();
+    globalTable.dump();
 }

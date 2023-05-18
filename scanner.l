@@ -21,7 +21,7 @@ int linenum = 1;
 char buf[MAX_LINE_LENG];
 char strTemp[MAX_LINE_LENG];
 // symbolTable s_table;
-enum dataType{type_int,type_real,type_string,type_bool,type_array};
+enum dataType{type_int,type_real,type_string,type_bool,type_array,type_function};
 %}
 
 digit [0-9]
@@ -82,7 +82,7 @@ end             {token(END);}
 exit            {token(EXIT);}
 false           {token(FALSE);yylval.boolVal = 0;}
 for             {token(FOR);}
-function        {token(FUNCTION);}
+function        {token(FUNCTION);yylval.type=type_function;}
 get             {token(GET);}
 if              {token(IF);}
 int             {token(INT);yylval.type=type_int;}
