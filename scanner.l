@@ -94,7 +94,7 @@ real            {token(REAL);yylval.type=type_real;}
 result          {token(RESULT);}
 return          {token(RETURN);}
 skip            {token(SKIP);}
-string          {token(STRING);}
+string          {token(STRING);yylval.type=type_string;}
 then            {token(THEN);}
 true            {token(TRUE);}
 var             {token(VAR);}
