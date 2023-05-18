@@ -80,7 +80,7 @@ do              {token(DO);}
 else            {token(ELSE);}
 end             {token(END);}
 exit            {token(EXIT);}
-false           {token(FALSE);}
+false           {token(FALSE);yylval.boolVal = 0;}
 for             {token(FOR);}
 function        {token(FUNCTION);}
 get             {token(GET);}
@@ -96,7 +96,7 @@ return          {token(RETURN);}
 skip            {token(SKIP);}
 string          {token(STRING);yylval.type=type_string;}
 then            {token(THEN);}
-true            {token(TRUE);}
+true            {token(TRUE);yylval.boolVal = 1;}
 var             {token(VAR);}
 when            {token(WHEN);}
 
@@ -104,6 +104,7 @@ when            {token(WHEN);}
         /*==========Identity==========*/
 {ID}            {
                 token(ID);
+                
                 // s_table.insert(yytext);
                 }
 
@@ -123,24 +124,24 @@ when            {token(WHEN);}
 
         /*==========STRING==========*/
 
-\"              {BEGIN(STRING_STATE);}
+\"                      {BEGIN(STRING_STATE);}
 
-<STRING_STATE>\n      {printf("Bad Charactor\n");} 
-
-
-
-<STRING_STATE>\"\"    {strcat(strTemp,"\"");}
+<STRING_STATE>\n        {printf("Bad Charactor\n");} 
 
 
-<STRING_STATE>\"      {
-                yytext=strTemp;
-                BEGIN(INITIAL);
-                tokenString(STR,strTemp);
-                LIST;
-                strcat(buf,"\"");
-                }
 
-<STRING_STATE>[^\"]*          {strcat(strTemp,yytext);}
+<STRING_STATE>\"\"      {strcat(strTemp,"\"");}
+
+
+<STRING_STATE>\"        {
+                        yytext=strTemp;
+                        BEGIN(INITIAL);
+                        tokenString(STR,strTemp);
+                        LIST;
+                        strcat(buf,"\"");
+                        }
+
+<STRING_STATE>[^\"]*    {strcat(strTemp,yytext);}
 
 
         /*==========COMMENT==========*/
