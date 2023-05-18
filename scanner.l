@@ -21,7 +21,7 @@ int linenum = 1;
 char buf[MAX_LINE_LENG];
 char strTemp[MAX_LINE_LENG];
 // symbolTable s_table;
-enum dataType{type_int,type_real,type_string,type_bool};
+enum dataType{type_int,type_real,type_string,type_bool,type_array};
 %}
 
 digit [0-9]
@@ -70,7 +70,7 @@ ID {alphaBat}+({digits}|{alphaBat})*
 
         /*==========KeyWord==========*/
 begin           {token(BEG);}
-array           {token(ARRAY);}
+array           {token(ARRAY);yylval.type=type_array;}
 bool            {token(BOOL);yylval.type=type_bool;}
 char            {token(CHAR);}
 const           {token(CONST);yylval.constant=1;}
@@ -123,7 +123,7 @@ when            {token(WHEN);}
 
         /*==========STRING==========*/
 
-\"              {BEGIN(STRING);}
+\"              {BEGIN(STRING_STATE);}
 
 <STRING_STATE>\n      {printf("Bad Charactor\n");} 
 

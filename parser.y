@@ -173,7 +173,8 @@ const_exp:      INT_NUMBER
                 |TRUE
                 |FALSE
                 ;
-bool_expression:    expressions '<' expressions{$$ = $1 < $3;}
+bool_expression:    '(' bool_expression ')'
+                    |expressions '<' expressions{$$ = $1 < $3;}
                     |expressions LESS_EQUAL expressions{$$ = $1 <= $3;}
                     |expressions '=' expressions{$$ = $1 == $3;}
                     |expressions MORE_EQUAL expressions{$$ = $1 >= $3;}
