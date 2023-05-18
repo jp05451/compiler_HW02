@@ -33,7 +33,7 @@ alphaBat [a-zA-Z]
 ID {alphaBat}+({digits}|{alphaBat})*
 
 
-%x STRING
+%x STRING_STATE
 %x COMMENT
 %x COMMENT_LINES
 
@@ -125,14 +125,14 @@ when            {token(WHEN);}
 
 \"              {BEGIN(STRING);}
 
-<STRING>\n      {printf("Bad Charactor\n");} 
+<STRING_STATE>\n      {printf("Bad Charactor\n");} 
 
 
 
-<STRING>\"\"    {strcat(strTemp,"\"");}
+<STRING_STATE>\"\"    {strcat(strTemp,"\"");}
 
 
-<STRING>\"      {
+<STRING_STATE>\"      {
                 yytext=strTemp;
                 LIST;
                 strcat(buf,"\"");
@@ -140,7 +140,7 @@ when            {token(WHEN);}
                 tokenString(STR,strTemp);
                 }
 
-<STRING>[^\"]*          {strcat(strTemp,yytext);}
+<STRING_STATE>[^\"]*          {strcat(strTemp,yytext);}
 
 
         /*==========COMMENT==========*/
