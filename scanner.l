@@ -21,7 +21,7 @@ int linenum = 1;
 char buf[MAX_LINE_LENG];
 char strTemp[MAX_LINE_LENG];
 // symbolTable s_table;
-enum dataType{type_int,type_real,type_string,type_bool,type_array,type_function};
+// enum dataType{type_int,type_real,type_string,type_bool,type_array,type_function};
 %}
 
 digit [0-9]
