@@ -7,6 +7,7 @@
 #define Trace(t)        printf(t)
 // int yylex();
 void yyerror(char *);
+symbolTable s_table;
 %}
 
 

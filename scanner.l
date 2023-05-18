@@ -20,7 +20,7 @@
 int linenum = 1;
 char buf[MAX_LINE_LENG];
 char strTemp[MAX_LINE_LENG];
-symbolTable s_table;
+// symbolTable s_table;
 enum dataType{type_int,type_real,type_string,type_bool};
 %}
 
@@ -90,7 +90,7 @@ loop            {token(LOOP);}
 of              {token(OF);}
 put             {token(PUT);}
 procedure       {token(PROCEDURE);}
-real            {token(REAL);}
+real            {token(REAL);yylval.type=type_real;}
 result          {token(RESULT);}
 return          {token(RETURN);}
 skip            {token(SKIP);}
