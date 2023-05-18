@@ -134,10 +134,10 @@ when            {token(WHEN);}
 
 <STRING_STATE>\"      {
                 yytext=strTemp;
-                LIST;
-                strcat(buf,"\"");
                 BEGIN(INITIAL);
                 tokenString(STR,strTemp);
+                LIST;
+                strcat(buf,"\"");
                 }
 
 <STRING_STATE>[^\"]*          {strcat(strTemp,yytext);}
