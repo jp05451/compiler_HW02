@@ -10,11 +10,13 @@ function itFibonacci (n: int) : int
   var FNminus1: int
   var temp: int
 
-  Fn := 1
+
+  Fn := temp
+  
   FNminus1 := 1
   loop
     exit when (n <= 2) 
-    temp := Fn
+    temp := n
     Fn := Fn + FNminus1
     FNminus1 := temp
     n := n - 1

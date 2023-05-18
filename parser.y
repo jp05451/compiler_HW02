@@ -1,5 +1,7 @@
 %{
 #include "lex.yy.cpp"
+#include<string.h>
+#include<math.h>
 // #include "symbolTable.hpp"
 
 #define Trace(t)        printf(t)
@@ -7,11 +9,28 @@
 void yyerror(char *);
 %}
 
+
+%union { 
+    //value
+    double doubleVal; 
+    int intVal;
+    char* string;
+    int boolVal;
+    //type
+    char type;
+    int constant;
+    //identity
+    char* identity;
+}
+
+%token <doubleVal> REAL_NUMBER 
+%token <intVal> INT_NUMBER
+%token <string> STR
 /* tokens */
 
 
-%token ID ARRAY BEG BOOL CHAR CONST DECREASING DEFAULT DO ELSE END EXIT FALSE FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN TRUE VAR WHEN 
-%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  STR INT_NUMBER REAL_NUMBER NEGATIVE
+%token ARRAY BEG BOOL CHAR  DECREASING DEFAULT DO ELSE END EXIT FALSE FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN TRUE VAR WHEN 
+%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  NEGATIVE ID CONST
 
 %left OR
 %left AND
@@ -20,6 +39,13 @@ void yyerror(char *);
 %left '+' '-'
 %left '*' '/' MOD
 %nonassoc NEGATIVE
+
+%type <doubleVal> expressions
+%type <intVal> bool_expression
+%type <type> types
+%type <identity> ID
+%type <constant> CONST
+
 
 %%
 
@@ -124,16 +150,19 @@ simple:         ID ASSIGN expressions
                 |SKIP
                 ;
 
-expressions:    NEGATIVE expressions
-                |'(' expressions ')'
-                |expressions '*' expressions
-                |expressions '/' expressions
-                |expressions MOD expressions
-                |expressions '+' expressions
-                |expressions '-' expressions
+
+    //======================expression=====================
+expressions:    '-' expressions %prec NEGATIVE{$$ = -$2;}
+                |'(' expressions ')'{$$ = $2;}
+                |expressions '*' expressions{$$ = $1 * $3;}
+                |expressions '/' expressions{if($3 == 0) yyerror("divide by zero");$$ = $1 / $3;}
+                |expressions MOD expressions{$$ =  fmod($1,$3);}
+                |expressions '+' expressions{$$ = $1 + $3;}
+                |expressions '-' expressions{$$ = $1 - $3;}
                 |bool_expression
                 |const_exp
                 |ID '[' INT ']'
+                |ID
                 ;
 const_exp:      INT_NUMBER
                 |REAL_NUMBER
@@ -141,15 +170,15 @@ const_exp:      INT_NUMBER
                 |TRUE
                 |FALSE
                 ;
-bool_expression:    expressions '<' expressions
-                    |expressions LESS_EQUAL expressions
-                    |expressions '=' expressions
-                    |expressions MORE_EQUAL expressions
-                    |expressions '>' expressions
-                    |expressions NOT_EQUAL expressions
-                    |expressions NOT expressions
-                    |expressions AND expressions
-                    |expressions OR expressions
+bool_expression:    expressions '<' expressions{$$ = $1 < $3;}
+                    |expressions LESS_EQUAL expressions{$$ = $1 <= $3;}
+                    |expressions '=' expressions{$$ = $1 == $3;}
+                    |expressions MORE_EQUAL expressions{$$ = $1 >= $3;}
+                    |expressions '>' expressions{$$ = $1 > $3;}
+                    |expressions NOT_EQUAL expressions{$$ = $1 != $3;}
+                    |NOT expressions{$$ = !$2;}
+                    |expressions AND expressions{$$ = $1 && $3;}
+                    |expressions OR expressions{$$ = $1 || $3;}
                     ;
 function_invocation:    ID '(' ')' 
                         |ID '(' functionInputA functionInputB ')'
@@ -175,12 +204,12 @@ conditional:    IF bool_expression THEN
 loop:           LOOP
                 contents
                 END LOOP
-                |FOR ID const_exp '.' '.' const_exp
+                |FOR ID ':' expressions  '.' '.' expressions
                 contents
-                END LOOP
-                |FOR DECREASING ID const_exp '.' '.' const_exp
+                END FOR
+                |FOR DECREASING ID ':' expressions  '.' '.' expressions
                 contents
-                END LOOP
+                END FOR
 
 %%
 
@@ -201,4 +230,5 @@ int main(int argc,char **argv)
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
+    s_table.dump();
 }

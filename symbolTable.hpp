@@ -9,7 +9,7 @@ using namespace std;
 
 enum symbolType
 {
-    id = 0
+    TYPE,VALUE
 };
 
 class symbolTable
@@ -22,13 +22,13 @@ public:
     ~symbolTable() {}
     void creat();
     int lookup(const string &symbol);
-    void insert(const string &symbol);
+    void insert(const string &symbol,const string&,const string&);
     void dump();
 
 private:
     // vector<vector<string>> table;
-    // unordered_map<int, vector<string>> table;
-    unordered_map<int, set<string>> table;
+    unordered_map<string, vector<string>> table;
+    // unordered_map<int, set<string>> table;
 };
 
 void symbolTable::creat()
@@ -38,17 +38,18 @@ void symbolTable::creat()
 
 int symbolTable::lookup(const string &symbol)
 {
-    // vector<string>::iterator iter = find(table[id].begin(), table[id].end(), symbol);
-    set<string>::iterator iter = find(table[id].begin(), table[id].end(), symbol);
-    if (iter == table[id].end())
-        return -1;
 
-    return distance(table[id].begin(), iter);
+    unordered_map<string, vector<string>>::const_iterator got = table.find(symbol);
+    if(got==table.end())
+        return 0;
+    else
+        return 1;
 }
 
-void symbolTable::insert(const string &symbol)
+void symbolTable::insert(const string &symbol,const string &type="",const string &value="")
 {
-    table[id].insert(symbol);
+    table[symbol][VALUE] = value;
+    table[symbol][TYPE] = type;
     cout << symbol << " is inserted" << endl;
 }
 
@@ -56,8 +57,8 @@ void symbolTable::dump()
 {
     cout << "Symbol Table:" << endl;
     // cout << "ID" << endl;
-    for (auto &a : table[id])
+    for (auto &a : table)
     {
-        cout << a << endl;
+        cout << a.second[TYPE]<<"\t"<<a.second[VALUE] << endl;
     }
 }
