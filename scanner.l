@@ -121,68 +121,21 @@ when            {token(WHEN);}
 
         /*==========STRING==========*/
 
-\"              {
-                        // LIST;
-                        // printf("begin string\n");
-                        BEGIN(STRING);
-                }
+\"              {BEGIN(STRING);}
 
 <STRING>\n      {printf("Bad Charactor\n");} 
 
 
 
-<STRING>\"\"    {
-                        // // yyless(yyleng-1);
-                        // // strcat(yytext,"test");
-                        // // puts(yytext);
-                        //                         printf("\"\"TEST:%d\n",yyleng);
-
-                        // puts(yytext);
-
-                        // yytext[--yyleng]='\0';
-                        
-                        // char c;
-                        // for(int i=0;i<5;i++)
-                        // {
-                        //         c=yyinput();
-                        // }
-
-
-                        // printf("\"\"TEST:%d\n",yyleng);
-                        // for(int i=0;i<=yyleng;i++)
-                        // {
-                        // if(yytext[i]!='\0')
-                        //         putchar(yytext[i]);
-                        // else
-                        //         printf("|NULL|");
-                        // }
-                        // puts("");
-
-                        // // char c = yyinput();
-                        // // c=yyinput();
-                        // // c=yyinput();
-
-                        // // putchar(c);
-                        // // puts("");
-                        
-                        // yymore();
-
-                        strcat(strTemp,"\"");
-
-                }
+<STRING>\"\"    {strcat(strTemp,"\"");}
 
 
 <STRING>\"      {
-                // yytext[yyleng-1]='\0';
-                // strcpy(yytext,strTemp);
-                // yytext=strTemp;
-                tokenString(STR,strTemp);
-                // strTemp[0]='\0';
                 yytext=strTemp;
                 LIST;
                 strcat(buf,"\"");
-                // puts(yytext);
                 BEGIN(INITIAL);
+                tokenString(STR,strTemp);
                 }
 
 <STRING>[^\"]*          {
