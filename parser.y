@@ -4,11 +4,13 @@
 #include<math.h>
 // #include "symbolTable.hpp"
 
+
 #define Trace(t)        printf(t)
 // int yylex();
 void yyerror(char *);
 symbolTable s_table;
 %}
+
 
 
 %union { 
@@ -21,7 +23,7 @@ symbolTable s_table;
     int type;
     int constant;
     //identity
-    char* identity;
+    char identity[256];
 }
 
 %token <realVal> REAL_NUMBER 
@@ -29,11 +31,13 @@ symbolTable s_table;
 %token <stringVal> STR
 %token <boolVal> TRUE
 %token <boolVal> FALSE
+%token <identity> ID
+%token <constant> CONST
 /* tokens */
 
 
-%token ARRAY BEG BOOL CHAR  DECREASING DEFAULT DO ELSE END EXIT FALSE FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN TRUE VAR WHEN 
-%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  NEGATIVE ID CONST
+%token ARRAY BEG BOOL CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN  VAR WHEN 
+%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  NEGATIVE 
 
 %left OR
 %left AND
@@ -46,8 +50,7 @@ symbolTable s_table;
 %type <realVal> expressions
 %type <intVal> bool_expression
 %type <type> types
-%type <identity> ID
-%type <constant> CONST
+
 
 
 %%

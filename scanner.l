@@ -103,8 +103,11 @@ when            {token(WHEN);}
 
         /*==========Identity==========*/
 {ID}            {
+                strcpy(yylval.identity,yytext);
+                // yylval.identity="ID";
+                printf(yylval.identity);
+                puts("");
                 token(ID);
-                
                 // s_table.insert(yytext);
                 }
 
