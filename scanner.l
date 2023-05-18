@@ -72,7 +72,7 @@ begin           {token(BEG);}
 array           {token(ARRAY);}
 bool            {token(BOOL);}
 char            {token(CHAR);}
-const           {token(CONST);}
+const           {token(CONST);yylval.constant=1;}
 decreasing      {token(DECREASING);}
 default         {token(DEFAULT);}
 do              {token(DO);}
@@ -103,7 +103,7 @@ when            {token(WHEN);}
         /*==========Identity==========*/
 {ID}            {
                 token(ID);
-                s_table.insert(yytext);
+                // s_table.insert(yytext);
                 }
 
 {integer}       {
