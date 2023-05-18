@@ -19,8 +19,8 @@ symbolTable globalTable;
     int intVal;
     char stringVal[256];
     int boolVal;
-    //type
-    int type;
+    //Type
+    dataType typeVal;
     int constant;
     //identity
     char identity[256];
@@ -49,7 +49,7 @@ symbolTable globalTable;
 
 %type <realVal> expressions
 %type <intVal> bool_expression
-%type <type> types
+%type <typeVal> Types
 
 
 
@@ -72,43 +72,43 @@ declaration:    constant
                 |procedure
                 ;
 
-constant:       CONST ID ':' type ASSIGN const_exp
+constant:       CONST ID ':' Type ASSIGN const_exp
                 |CONST ID ASSIGN const_exp
                 ;
 
-variable:       VAR ID ':' type
+variable:       VAR ID ':' Type
                 |VAR ID ASSIGN const_exp
-                |VAR ID ':' type ASSIGN const_exp
+                |VAR ID ':' Type ASSIGN const_exp
                 ;
 
-types:          type
+Types:          Type
                 |array
                 ;
 
-array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF type
+array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF Type
                 ;
 
-type:           BOOL
+Type:           BOOL
                 |INT
                 |REAL
                 |STRING
                 ;
 
-function:       FUNCTION ID '(' ')' ':' types
+function:       FUNCTION ID '(' ')' ':' Types
                 contents
                 END ID
-                |FUNCTION ID '(' functionVarA functionVarB ')' ':' types
+                |FUNCTION ID '(' functionVarA functionVarB ')' ':' Types
                 contents
                 END ID
                 ;
 
 
 
-functionVarA:   ID ':' type
+functionVarA:   ID ':' Type
                 |array
                 ;
 
-functionVarB:   functionVarB ',' ID ':' type
+functionVarB:   functionVarB ',' ID ':' Type
                 |
                 ;
 
