@@ -24,18 +24,20 @@ symbolData data;
 }
 
 %token <value> REAL INT STRING BOOL
-%token <dataIdentity> ID
+%token <dataIdentity> ID TRUE FALSE INT_NUMBER REAL_NUMBER STR
 %token <isConst> CONST
 
-%type <dataIdentity> expressions
+%type <dataIdentity> expressions 
 %type <dataIdentity> bool_expression
+%type <dataIdentity> const_exp
 %type <dType> Types
 
 /* tokens */
 %token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN 
 %token ASSIGN MOD 
 %token LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT 
-%token INT_NUMBER REAL_NUMBER STR TRUE FALSE
+%token INT_NUMBER REAL_NUMBER STR 
+    /* TRUE FALSE */
 
 %left OR
 %left AND
@@ -70,6 +72,9 @@ declaration:    constant
 
 constant:       CONST ID ':' Type ASSIGN const_exp
                 |CONST ID ASSIGN const_exp
+                {
+                    printf("%d %s is %s",$1,$2,$4);
+                }
                 ;
 
 variable:       VAR ID ':' Type
@@ -120,7 +125,7 @@ contents:       contents content
                 |
                 ;
 
-content:        variable
+content:        variable    
                 |constant
                 |array
                 |statment
@@ -166,11 +171,11 @@ expressions:    '-' expressions %prec NEGATIVE
                 |ID '[' INT ']'
                 |ID
                 ;
-const_exp:      INT_NUMBER
-                |REAL_NUMBER
-                |STR
-                |TRUE
-                |FALSE
+const_exp:      INT_NUMBER      {strcpy($$,$1);}
+                |REAL_NUMBER    {strcpy($$,$1);}
+                |STR            {strcpy($$,$1);}
+                |TRUE           {puts($1);strcpy($$,$1);}
+                |FALSE          {strcpy($$,$1);}
                 ;
 bool_expression:    '(' bool_expression ')'
                     |expressions '<' expressions

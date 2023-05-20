@@ -70,9 +70,12 @@ ID {alphaBat}+({digits}|{alphaBat})*
         /*==========KeyWord==========*/
 begin           {token(BEG);}
 array           {token(ARRAY);}
-bool            {token(BOOL);yylval.dType=type_bool;}
+bool            {
+                yylval.dType=type_bool;
+                token(BOOL);
+                }
 char            {token(CHAR);}
-const           {token(CONST);}
+const           {yylval.isConst = 1;token(CONST);}
 decreasing      {token(DECREASING);}
 default         {token(DEFAULT);}
 do              {token(DO);}
@@ -95,15 +98,18 @@ return          {token(RETURN);}
 skip            {token(SKIP);}
 string          {token(STRING);}
 then            {token(THEN);}
-true            {token(TRUE);}
-var             {token(VAR);}
+true            {
+                strcpy(yylval.dataIdentity,"true");
+                token(TRUE);
+                }
+var             {token(VAR);yylval.isConst = 0;}
 when            {token(WHEN);}
 
 
         /*==========Identity==========*/
 {ID}            {
-                token(ID);
                 sprintf(yylval.dataIdentity,"%s",yytext);
+                token(ID);
                 }
 
 {integer}       {
