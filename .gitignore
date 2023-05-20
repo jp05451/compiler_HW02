@@ -1,1 +1,6 @@
-lex.yy.cpp y.tab.cpp y.output scanner parser y.tab.hpp
+lex.yy.cpp
+y.tab.cpp
+y.output
+scanner
+parser
+y.tab.hpp
