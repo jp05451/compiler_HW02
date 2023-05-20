@@ -129,7 +129,7 @@ when            {token(WHEN);}
         /*==========STRING==========*/
 
 \"                      {
-                                strcat(buf,"\"");
+                                // strcat(buf,"\"");
                                 BEGIN(STRING_STATE);
                         }
 
@@ -190,6 +190,8 @@ when            {token(WHEN);}
         printf("%d: %s", linenum++, buf);
         buf[0] = '\0';
         }
+
+
         /*==========white space==========*/
 [ \t]*  {LIST;}
 

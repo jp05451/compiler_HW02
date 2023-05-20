@@ -8,7 +8,8 @@
 #define Trace(t)        printf(t)
 // int yylex();
 void yyerror(char *);
-symbolTable globalTable;
+symbolTable currentTable;
+stack<symbolTable> tableStack;
 
 symbolData data;
 
@@ -30,13 +31,13 @@ symbolData data;
 %type <dataIdentity> expressions 
 %type <dataIdentity> bool_expression
 %type <dataIdentity> const_exp
-%type <dType> Types
+%type <dType> Types Type
 
 /* tokens */
 %token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN 
 %token ASSIGN MOD 
 %token LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT 
-%token INT_NUMBER REAL_NUMBER STR 
+/* %token INT_NUMBER REAL_NUMBER STR  */
     /* TRUE FALSE */
 
 %left OR
@@ -71,9 +72,36 @@ declaration:    constant
                 ;
 
 constant:       CONST ID ':' Type ASSIGN const_exp
+                {
+                    printf("%d %s is %s\n",$1,$2,$6);
+                    if(currentTable.lookup($2)!=0)
+                    {
+                        char errorMSG[256]={'\0'};
+                        sprintf(errorMSG,"%s redefine",$2);
+                        yyerror(errorMSG);
+                    }
+                    if($4!=getType($6,$1))
+                    {
+                        yyerror("invalid assign");
+                    }
+                    else
+                    {
+                        currentTable.insert($2,getType($6,1),$6);
+                    }
+                }
                 |CONST ID ASSIGN const_exp
                 {
-                    printf("%d %s is %s",$1,$2,$4);
+                    // printf("%d %s is %s\n",$1,$2,$4);
+                    if(currentTable.lookup($2)!=0)
+                    {
+                        char errorMSG[256]={'\0'};
+                        sprintf(errorMSG,"%s redefine",$2);
+                        yyerror(errorMSG);
+                    }
+                    else
+                    {
+                        currentTable.insert($2,getType($4,1),$4);
+                    }
                 }
                 ;
 
@@ -174,7 +202,7 @@ expressions:    '-' expressions %prec NEGATIVE
 const_exp:      INT_NUMBER      {strcpy($$,$1);}
                 |REAL_NUMBER    {strcpy($$,$1);}
                 |STR            {strcpy($$,$1);}
-                |TRUE           {puts($1);strcpy($$,$1);}
+                |TRUE           {strcpy($$,$1);}
                 |FALSE          {strcpy($$,$1);}
                 ;
 bool_expression:    '(' bool_expression ')'
@@ -238,5 +266,5 @@ int main(int argc,char **argv)
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
-    globalTable.dump();
+    currentTable.dump();
 }
