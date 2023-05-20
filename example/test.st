@@ -1,2 +1,1 @@
-const aaa := true
-%const aaa := true
+var aaa:int := 8

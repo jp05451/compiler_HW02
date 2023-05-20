@@ -24,9 +24,9 @@ symbolData data;
     char dataIdentity[256];
 }
 
-%token <value> REAL INT STRING BOOL
+%token <dType> REAL INT STRING BOOL
 %token <dataIdentity> ID TRUE FALSE INT_NUMBER REAL_NUMBER STR
-%token <isConst> CONST
+%token <isConst> CONST VAR
 
 %type <dataIdentity> expressions 
 %type <dataIdentity> bool_expression
@@ -73,14 +73,14 @@ declaration:    constant
 
 constant:       CONST ID ':' Type ASSIGN const_exp
                 {
-                    printf("%d %s is %s\n",$1,$2,$6);
+                    // printf("%d %s is %s\n",$1,$2,$6);
                     if(currentTable.lookup($2)!=0)
                     {
                         char errorMSG[256]={'\0'};
                         sprintf(errorMSG,"%s redefine",$2);
                         yyerror(errorMSG);
                     }
-                    if($4!=getType($6,$1))
+                    if($4!=getType($6,0))
                     {
                         yyerror("invalid assign");
                     }
@@ -106,21 +106,84 @@ constant:       CONST ID ':' Type ASSIGN const_exp
                 ;
 
 variable:       VAR ID ':' Type
+                {
+                    // printf("%d %s is %s\n",$1,$2,$4);
+                    if(currentTable.lookup($2)!=0)
+                    {
+                        char errorMSG[256]={'\0'};
+                        sprintf(errorMSG,"%s redefine",$2);
+                        yyerror(errorMSG);
+                    }
+                    else
+                    {
+                        if($4==0)
+                            currentTable.insert($2,type_int,"");
+                        else if($4==1)
+                            currentTable.insert($2,type_real,"");
+                        else if($4==2)
+                            currentTable.insert($2,type_string,"");
+                        else if($4==3)
+                            currentTable.insert($2,type_bool,"");
+                    }
+                }
                 |VAR ID ASSIGN const_exp
+                {
+                    // printf("%d %s is %s\n",$1,$2,$4);
+                    if(currentTable.lookup($2)!=0)
+                    {
+                        char errorMSG[256]={'\0'};
+                        sprintf(errorMSG,"%s redefine",$2);
+                        yyerror(errorMSG);
+                    }
+                    else
+                    {
+                        if($4==0)
+                            currentTable.insert($2,getType($4,0),$4);
+                    }
+                }
+
                 |VAR ID ':' Type ASSIGN const_exp
+                {
+
+                    // printf("%d\n",$4);
+                    // puts($6);
+                    // printf("%d\n",getType("8",0));
+                    if(currentTable.lookup($2)!=0)
+                    {
+                        char errorMSG[256]={'\0'};
+                        sprintf(errorMSG,"%s redefine",$2);
+                        yyerror(errorMSG);
+                    }
+                    else if($4!=getType($6,0))
+                    {
+                        yyerror("invalid assign");
+                    }
+                    else
+                    {
+                        printf("%s\n",$6);
+                        if($4==0)
+                            currentTable.insert($2,type_int,$6);
+                        else if($4==1)
+                            currentTable.insert($2,type_real,$6);
+                        else if($4==2)
+                            currentTable.insert($2,type_string,$6);
+                        else if($4==3)
+                            currentTable.insert($2,type_bool,$6);
+                    }
+                }
                 ;
 
-Types:          Type
+Types:          Type    
                 |array
                 ;
 
 array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF Type
                 ;
 
-Type:           BOOL
-                |INT
-                |REAL
-                |STRING
+Type:           BOOL        {$$=$1;}
+                |INT        {$$=$1;}
+                |REAL       {$$=$1;}
+                |STRING     {$$=$1;}
                 ;
 
 function:       FUNCTION ID '(' ')' ':' Types

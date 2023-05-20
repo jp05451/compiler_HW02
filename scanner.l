@@ -87,7 +87,10 @@ for             {token(FOR);}
 function        {token(FUNCTION);}
 get             {token(GET);}
 if              {token(IF);}
-int             {token(INT);}
+int             {
+                yylval.dType=type_int;
+                token(INT);
+                }
 loop            {token(LOOP);}
 of              {token(OF);}
 put             {token(PUT);}
@@ -116,7 +119,8 @@ when            {token(WHEN);}
                 int intNumber;
                 sscanf(yytext,"%d",&intNumber);
                 sprintf(yylval.dataIdentity,"%d",intNumber);
-                yylval.dType=type_int;
+                // puts(yylval.dataIdentity);
+                // yylval.dType=type_int;
                 tokenInteger(INT_NUMBER,intNumber);
 }
 {numerical}     {

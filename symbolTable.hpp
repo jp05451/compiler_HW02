@@ -6,15 +6,31 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <stack>
 
 #define MAX_LINE_LENG 256
 
 using namespace std;
 
+string typeString[] = {
+                       "int",
+                       "real",
+                       "string",
+                       "bool",
+                       "array",
+                       // const
+                       "const_int",
+                       "const_real",
+                       "const_string",
+                       "const_bool",
+                       "const_array",
+                       //function
+                       "function"};
+
 enum dataType
 {
-    type_error=-1,
+    type_error = -1,
     type_int,
     type_real,
     type_string,
@@ -26,7 +42,7 @@ enum dataType
     type_const_string,
     type_const_bool,
     type_const_array,
-    //funcion
+    // funcion
     type_function
 
 };
@@ -90,7 +106,7 @@ public:
     void insert(const string, const dataType, const string);
     void dump();
 
-// private:
+    // private:
     // vector<vector<string>> table;
     unordered_map<string, symbolData> table;
     // unordered_map<int, set<string>> table;
@@ -120,21 +136,28 @@ void symbolTable::insert(const string symbol, const dataType _type, const string
     }
     if (_type == type_const_bool || _type == type_bool)
     {
-        table[symbol].realVal = value=="true"? 1:0;
+        table[symbol].realVal = value == "true" ? 1 : 0;
         return;
     }
+    if (value == "")
+    {
+        table[symbol].realVal = 0;
+        return;
+    }
+
     table[symbol].realVal = stoi(value);
 }
 
 void symbolTable::dump()
 {
-    cout<<"=============================="<<endl;
+    int width = 20;
+    cout << "==============================" << endl;
     cout << "Symbol Table:" << endl;
-    cout << "ID\ttype\tvalue" << endl;
+    cout << "ID" << "\t\t" << "type" << "\t\t"<< "value" << endl;
     for (auto &a : table)
     {
-        cout << a.first << "\t" << a.second.type << "\t";
-        if (a.second.type == type_const_string || a.second.type == type_string)
+        cout << a.first << "\t\t" <<typeString[a.second.type]<<"\t\t";
+            if (a.second.type == type_const_string || a.second.type == type_string)
         {
             cout << a.second.stringVal << endl;
         }
@@ -143,6 +166,6 @@ void symbolTable::dump()
             cout << a.second.realVal << endl;
         }
     }
-    }
+}
 
 #endif
