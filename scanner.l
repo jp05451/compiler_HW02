@@ -15,7 +15,6 @@
 #define tokenString(t,s) {LIST; printf("<%s:%s>\n",#t,s); return t;}
 // #define yyDebug(s) printf("%s",s);
 
-#define MAX_LINE_LENG 256
 
 int linenum = 1;
 char buf[MAX_LINE_LENG];
@@ -70,54 +69,53 @@ ID {alphaBat}+({digits}|{alphaBat})*
 
         /*==========KeyWord==========*/
 begin           {token(BEG);}
-array           {token(ARRAY);yylval.type=type_array;}
-bool            {token(BOOL);yylval.type=type_bool;}
+array           {token(ARRAY);}
+bool            {token(BOOL);yylval.dType=type_bool;}
 char            {token(CHAR);}
-const           {token(CONST);yylval.constant=1;}
+const           {token(CONST);}
 decreasing      {token(DECREASING);}
 default         {token(DEFAULT);}
 do              {token(DO);}
 else            {token(ELSE);}
 end             {token(END);}
 exit            {token(EXIT);}
-false           {token(FALSE);yylval.boolVal = 0;}
+false           {token(FALSE);}
 for             {token(FOR);}
-function        {token(FUNCTION);yylval.type=type_function;}
+function        {token(FUNCTION);}
 get             {token(GET);}
 if              {token(IF);}
-int             {token(INT);yylval.type=type_int;}
+int             {token(INT);}
 loop            {token(LOOP);}
 of              {token(OF);}
 put             {token(PUT);}
 procedure       {token(PROCEDURE);}
-real            {token(REAL);yylval.type=type_real;}
+real            {token(REAL);}
 result          {token(RESULT);}
 return          {token(RETURN);}
 skip            {token(SKIP);}
-string          {token(STRING);yylval.type=type_string;}
+string          {token(STRING);}
 then            {token(THEN);}
-true            {token(TRUE);yylval.boolVal = 1;}
+true            {token(TRUE);}
 var             {token(VAR);}
 when            {token(WHEN);}
 
 
         /*==========Identity==========*/
 {ID}            {
-                strcpy(yylval.identity,yytext);
-                printf("ID: %s\n",yylval.identity);
                 token(ID);
+                sprintf(yylval.dataIdentity,"%s",yytext);
                 }
 
 {integer}       {
                 int intNumber;
                 sscanf(yytext,"%d",&intNumber);
-                yylval.intVal=intNumber;
+                sprintf(yylval.dataIdentity,"%d",intNumber);
+                yylval.dType=type_int;
                 tokenInteger(INT_NUMBER,intNumber);
 }
 {numerical}     {
                 double doubleNumber;
                 sscanf(yytext,"%f",&doubleNumber);
-                yylval.realVal=doubleNumber;
                 tokenInteger(REAL_NUMBER,doubleNumber);
                 }
 
@@ -138,9 +136,7 @@ when            {token(WHEN);}
 
 <STRING_STATE>\"        {
                         yytext=strTemp;
-                        // strcpy(yytext,strTemp);
                         BEGIN(INITIAL);
-                        strcpy(yylval.stringVal,strTemp);
                         tokenString(STR,strTemp);
                         // LIST;
                         // strcat(buf,"\"");

@@ -1,43 +1,41 @@
 %{
-#include "lex.yy.cpp"
 #include<string.h>
 #include<math.h>
-// #include "symbolTable.hpp"
+#include "lex.yy.cpp"
+#include "symbolTable.hpp"
 
 
 #define Trace(t)        printf(t)
 // int yylex();
 void yyerror(char *);
 symbolTable globalTable;
+
+symbolData data;
+
 %}
 
 
 
 %union { 
-    //value
-    double realVal; 
-    int intVal;
-    char stringVal[256];
-    int boolVal;
-    //Type
-    dataType typeVal;
-    int constant;
-    //identity
-    char identity[256];
+    int dType;
+    double value;
+    int isConst;
+    char dataIdentity[256];
 }
 
-%token <realVal> REAL_NUMBER 
-%token <intVal> INT_NUMBER
-%token <stringVal> STR
-%token <boolVal> TRUE
-%token <boolVal> FALSE
-%token <identity> ID
-%token <constant> CONST
+%token <value> REAL INT STRING BOOL
+%token <dataIdentity> ID
+%token <isConst> CONST
+
+%type <dataIdentity> expressions
+%type <dataIdentity> bool_expression
+%type <dType> Types
+
 /* tokens */
-
-
-%token ARRAY BEG BOOL CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF INT LOOP OF PUT PROCEDURE REAL RESULT RETURN SKIP STRING THEN  VAR WHEN 
-%token MOD ASSIGN LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT  NEGATIVE 
+%token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN 
+%token ASSIGN MOD 
+%token LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT 
+%token INT_NUMBER REAL_NUMBER STR TRUE FALSE
 
 %left OR
 %left AND
@@ -47,9 +45,7 @@ symbolTable globalTable;
 %left '*' '/' MOD
 %nonassoc NEGATIVE
 
-%type <realVal> expressions
-%type <intVal> bool_expression
-%type <typeVal> Types
+
 
 
 
@@ -158,13 +154,13 @@ simple:         ID ASSIGN expressions
 
 
     //======================expression=====================
-expressions:    '-' expressions %prec NEGATIVE{$$ = -$2;}
-                |'(' expressions ')'{$$ = $2;}
-                |expressions '*' expressions{$$ = $1 * $3;}
-                |expressions '/' expressions{if($3 == 0) yyerror("divide by zero");$$ = $1 / $3;}
-                |expressions MOD expressions{$$ =  fmod($1,$3);}
-                |expressions '+' expressions{$$ = $1 + $3;}
-                |expressions '-' expressions{$$ = $1 - $3;}
+expressions:    '-' expressions %prec NEGATIVE
+                |'(' expressions ')'
+                |expressions '*' expressions
+                |expressions '/' expressions
+                |expressions MOD expressions
+                |expressions '+' expressions
+                |expressions '-' expressions
                 |bool_expression
                 |const_exp
                 |ID '[' INT ']'
@@ -177,15 +173,15 @@ const_exp:      INT_NUMBER
                 |FALSE
                 ;
 bool_expression:    '(' bool_expression ')'
-                    |expressions '<' expressions{$$ = $1 < $3;}
-                    |expressions LESS_EQUAL expressions{$$ = $1 <= $3;}
-                    |expressions '=' expressions{$$ = $1 == $3;}
-                    |expressions MORE_EQUAL expressions{$$ = $1 >= $3;}
-                    |expressions '>' expressions{$$ = $1 > $3;}
-                    |expressions NOT_EQUAL expressions{$$ = $1 != $3;}
-                    |NOT expressions{$$ = !$2;}
-                    |expressions AND expressions{$$ = $1 && $3;}
-                    |expressions OR expressions{$$ = $1 || $3;}
+                    |expressions '<' expressions
+                    |expressions LESS_EQUAL expressions
+                    |expressions '=' expressions
+                    |expressions MORE_EQUAL expressions
+                    |expressions '>' expressions
+                    |expressions NOT_EQUAL expressions
+                    |NOT expressions
+                    |expressions AND expressions
+                    |expressions OR expressions
                     ;
 function_invocation:    ID '(' ')' 
                         |ID '(' functionInputA functionInputB ')'
