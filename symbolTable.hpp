@@ -127,6 +127,7 @@ void symbolTable::insert(const string symbol, const dataType _type,bool _isConst
     }
     table[symbol].type = _type;
     table[symbol].isConst = _isConst;
+    cout << symbol << " is inserted" << endl;
 }
 
 void symbolTable::dump()
@@ -142,7 +143,7 @@ void symbolTable::dump()
     for (auto &a : table)
     {
         cout << a.first << "\t\t";
-        a.second.isConst ? cout << "const" : cout << "";
+        a.second.isConst ? cout << "const " : cout << "";
         cout << typeString[a.second.type] << endl;
     }
 }

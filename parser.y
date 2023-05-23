@@ -77,17 +77,29 @@ constant:       CONST ID ':' Type ASSIGN expressions
                 }
                 
                 |CONST ID ASSIGN expressions
-                
+                {
+                    // if($4!=$6)
+                    //     yyerror("ERROR: const assign type error");
+                    currentTable.insert($2,intToType($4),1);
+                }
                 ;
 
 variable:       VAR ID ':' Type
                 {
-
+                    currentTable.insert($2,intToType($4),0);
                 }
                 |VAR ID ASSIGN const_exp
-                
-
+                {
+                    // if($4!=$6)
+                    //     yyerror("ERROR: const assign type error");
+                    currentTable.insert($2,intToType($4),0);
+                }
                 |VAR ID ':' Type ASSIGN const_exp
+                {
+                    if($4!=$6)
+                        yyerror("ERROR: const assign type error");
+                    currentTable.insert($2,intToType($4),0);
+                }
                 
                 ;
 
@@ -233,8 +245,13 @@ const_exp:      INT_NUMBER      {$$=$1;}
                 |TRUE           {$$=$1;}
                 |FALSE          {$$=$1;}
                 ;
-bool_expression:    '(' bool_expression ')'
-                    |expressions '<' expressions
+bool_expression:    '(' bool_expression ')'             {$$=$2;}
+                    |expressions '<' expressions   
+                    {
+                    if($1!=$3)
+                        yyerror("ERROR:bool_expression type error");
+                    $$=$1;
+                    }     
                     |expressions LESS_EQUAL expressions
                     |expressions '=' expressions
                     |expressions MORE_EQUAL expressions
