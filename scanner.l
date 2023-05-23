@@ -75,7 +75,7 @@ bool            {
                 token(BOOL);
                 }
 char            {token(CHAR);}
-const           {yylval.isConst = 1;token(CONST);}
+const           {token(CONST);}
 decreasing      {token(DECREASING);}
 default         {token(DEFAULT);}
 do              {token(DO);}
@@ -95,17 +95,20 @@ loop            {token(LOOP);}
 of              {token(OF);}
 put             {token(PUT);}
 procedure       {token(PROCEDURE);}
-real            {token(REAL);}
+real            {
+                yylval.dType=type_real;
+                token(REAL);
+                }
 result          {token(RESULT);}
 return          {token(RETURN);}
 skip            {token(SKIP);}
 string          {token(STRING);}
 then            {token(THEN);}
 true            {
-                strcpy(yylval.dataIdentity,"true");
+                // strcpy(yylval.dType,"true");
                 token(TRUE);
                 }
-var             {token(VAR);yylval.isConst = 0;}
+var             {token(VAR);}
 when            {token(WHEN);}
 
 
@@ -118,7 +121,8 @@ when            {token(WHEN);}
 {integer}       {
                 int intNumber;
                 sscanf(yytext,"%d",&intNumber);
-                sprintf(yylval.dataIdentity,"%d",intNumber);
+                // sprintf(yylval.dataIdentity,"%d",intNumber);
+                yylval.dType=type_int;
                 // puts(yylval.dataIdentity);
                 // yylval.dType=type_int;
                 tokenInteger(INT_NUMBER,intNumber);
@@ -126,6 +130,7 @@ when            {token(WHEN);}
 {numerical}     {
                 double doubleNumber;
                 sscanf(yytext,"%f",&doubleNumber);
+                yylval.dType=type_real;
                 tokenInteger(REAL_NUMBER,doubleNumber);
                 }
 

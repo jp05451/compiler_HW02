@@ -20,21 +20,19 @@ symbolData data;
 %union { 
     int dType;
     double value;
-    int isConst;
     char dataIdentity[256];
 }
 
-%token <dType> REAL INT STRING BOOL 
-%token <dataIdentity> ID TRUE FALSE INT_NUMBER REAL_NUMBER STR
-%token <isConst> CONST VAR
+%token <dType> REAL INT STRING BOOL TRUE FALSE INT_NUMBER REAL_NUMBER STR
+%token <dataIdentity> ID 
 
-%type <dataIdentity> expressions 
-%type <dataIdentity> bool_expression
-%type <dataIdentity> const_exp
+%type <dType> expressions 
+%type <dType> bool_expression
+%type <dType> const_exp
 %type <dType> Types Type array function_invocation
 
 /* tokens */
-%token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN 
+%token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN CONST 
 %token ASSIGN MOD 
 %token LESS_EQUAL MORE_EQUAL NOT_EQUAL AND OR NOT 
 /* %token INT_NUMBER REAL_NUMBER STR  */
@@ -71,100 +69,26 @@ declaration:    constant
                 |procedure
                 ;
 
-constant:       CONST ID ':' Type ASSIGN const_exp
+constant:       CONST ID ':' Type ASSIGN expressions
                 {
-                    // printf("%d %s is %s\n",$1,$2,$6);
-                    if(currentTable.lookup($2)!=0)
-                    {
-                        char errorMSG[256]={'\0'};
-                        sprintf(errorMSG,"%s redefine",$2);
-                        yyerror(errorMSG);
-                    }
-                    if($4!=currentTable.getType($6,0))
-                    {
-                        yyerror("invalid assign");
-                    }
-                    else
-                    {
-                        currentTable.insert($2,currentTable.getType($6,1),$6);
-                    }
+                    if($4!=$6)
+                        yyerror("ERROR: const assign type error");
+                    currentTable.insert($2,intToType($4),1);
                 }
-                |CONST ID ASSIGN const_exp
-                {
-                    // printf("%d %s is %s\n",$1,$2,$4);
-                    if(currentTable.lookup($2)!=0)
-                    {
-                        char errorMSG[256]={'\0'};
-                        sprintf(errorMSG,"%s redefine",$2);
-                        yyerror(errorMSG);
-                    }
-                    else
-                    {
-                        currentTable.insert($2,currentTable.getType($4,1),$4);
-                    }
-                }
+                
+                |CONST ID ASSIGN expressions
+                
                 ;
 
 variable:       VAR ID ':' Type
                 {
-                    // printf("%d %s is %s\n",$1,$2,$4);
-                    if(currentTable.lookup($2)!=0)
-                    {
-                        char errorMSG[256]={'\0'};
-                        sprintf(errorMSG,"%s redefine",$2);
-                        yyerror(errorMSG);
-                    }
-                    else
-                    {
-                        currentTable.insert($2,intToType($4),"");
-                    }
+
                 }
                 |VAR ID ASSIGN const_exp
-                {
-                    // printf("%d %s is %s\n",$1,$2,$4);
-                    if(currentTable.lookup($2)!=0)
-                    {
-                        char errorMSG[256]={'\0'};
-                        sprintf(errorMSG,"%s redefine",$2);
-                        yyerror(errorMSG);
-                    }
-                    else
-                    {
-                        if($4==0)
-                            currentTable.insert($2,currentTable.getType($4,0),$4);
-                    }
-                }
+                
 
                 |VAR ID ':' Type ASSIGN const_exp
-                {
-
-                    // printf("%d\n",$4);
-                    // puts($6);
-                    // printf("%d\n",getType("8",0));
-                    if(currentTable.lookup($2)!=0)
-                    {
-                        char errorMSG[256]={'\0'};
-                        sprintf(errorMSG,"%s redefine",$2);
-                        yyerror(errorMSG);
-                    }
-                    else if($4!=currentTable.getType($6,0))
-                    {
-                        yyerror("invalid assign");
-                    }
-                    else
-                    {
-                        printf("%s\n",$6);
-                        currentTable.insert($2,intToType($4),$6);
-                        // if($4==0)
-                        //     currentTable.insert($2,type_int,$6);
-                        // else if($4==1)
-                        //     currentTable.insert($2,type_real,$6);
-                        // else if($4==2)
-                        //     currentTable.insert($2,type_string,$6);
-                        // else if($4==3)
-                        //     currentTable.insert($2,type_bool,$6);
-                    }
-                }
+                
                 ;
 
 Types:          Type    {$$=$1;}  
@@ -172,22 +96,7 @@ Types:          Type    {$$=$1;}
                 ;
 
 array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF Type
-                {
-                    if(currentTable.getType($6,0)!=currentTable.getType($9,0))
-                    {
-                        yyerror("ERROR: array declare error");
-                    }
-                    else
-                    {
-                        char temp[256]={'\0'};
-                        strcat(temp,$6);
-                        strcat(temp,",");
-                        strcat(temp,$9);
-
-                        currentTable.insert($2,type_array,temp);
-                    }
-                    $$=$11;
-                }
+                
                 ;
 
 Type:           BOOL        {$$=$1;}
@@ -199,9 +108,7 @@ Type:           BOOL        {$$=$1;}
 function:       FUNCTION ID '(' ')' ':' Types
                 contents
                 END ID
-                {
-                    
-                }
+                
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' Types
                 contents
                 END ID
@@ -263,23 +170,68 @@ simple:         ID ASSIGN expressions
 
 
     //======================expression=====================
-expressions:    '-' expressions %prec NEGATIVE
-                |'(' expressions ')'
+expressions:    '-' expressions %prec NEGATIVE  
+                {
+                    if($2!=type_int||$2!=type_real)
+                    {
+                        yyerror("ERROR: unable to calculate negetive");
+                    }
+                    $$=$2;
+                }
+                |'(' expressions ')'            {$$=$2;}
                 |expressions '*' expressions
+                {
+                    if($1!=$3)
+                        yyerror("ERROR: type error");
+                    $$=$1;
+                }
                 |expressions '/' expressions
-                |expressions MOD expressions
+                {
+                    if($1!=$3)
+                        yyerror("ERROR: type error");
+                    $$=$1;
+                }
+                |expressions MOD expressions{
+                    if($1!=$3)
+                        yyerror("ERROR: type error");
+                    $$=$1;
+                }
                 |expressions '+' expressions
+                {
+                    if($1!=$3)
+                        yyerror("ERROR: type error");
+                    $$=$1;
+                }
                 |expressions '-' expressions
-                |bool_expression
-                |const_exp
+                {
+                    if($1!=$3)
+                        yyerror("ERROR: type error");
+                    $$=$1;
+                }
+                |bool_expression    {$$=$1;}
+                |const_exp          {$$=$1;}
                 |ID '[' INT ']'
+                {
+                    if(currentTable.lookup($1)==0)
+                    {
+                        yyerror("ERROR: ID not found");
+                    }
+                    $$=currentTable.table[$1].type;
+                }
                 |ID
+                {
+                if(currentTable.lookup($1)==0)
+                    {
+                        yyerror("ERROR: ID not found");
+                    }
+                    $$=currentTable.table[$1].type;
+                }
                 ;
-const_exp:      INT_NUMBER      {strcpy($$,$1);}
-                |REAL_NUMBER    {strcpy($$,$1);}
-                |STR            {strcpy($$,$1);}
-                |TRUE           {strcpy($$,$1);}
-                |FALSE          {strcpy($$,$1);}
+const_exp:      INT_NUMBER      {$$=$1;}
+                |REAL_NUMBER    {$$=$1;}
+                |STR            {$$=$1;}
+                |TRUE           {$$=$1;}
+                |FALSE          {$$=$1;}
                 ;
 bool_expression:    '(' bool_expression ')'
                     |expressions '<' expressions
@@ -295,9 +247,6 @@ bool_expression:    '(' bool_expression ')'
 function_invocation:    ID '(' ')' 
                         |ID '(' functionInputA functionInputB ')'
                         ;
-    /* procedure_invacation:   ID '(' ')'
-                            |ID '(' functionInputA functionInputB ')'
-                            ; */
 functionInputA:     expressions
                     ;
 functionInputB:     functionInputB ',' expressions

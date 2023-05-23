@@ -1,1 +1,1 @@
-var aaa:int := 8
+var aaa:int := -8
