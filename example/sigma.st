@@ -4,12 +4,12 @@
  %}
 
 % constant and variable declarations
-const n: int := 10
+const n: int := 10.0
 var sum: int
 var index: int
 
 % main statements
-sum := 0
+n := 0
 for index: 1 .. n 
   sum := sum + index
 end for

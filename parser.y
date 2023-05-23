@@ -129,6 +129,7 @@ function:       FUNCTION ID '(' ')' ':' Types
                 }
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' Types
                 {
+                    // printf("HAHAHA\n");
                     s_table.insert($2,intToType($8),is_func,0);
                     currentStack=++stackNumber;
                 }
@@ -178,15 +179,27 @@ statment:       block
                 |loop
                 ;
 
-/* blocks:         blocks block
-                |
-                ; */
+
 block:          BEG
                 content
                 END
                 ;
 
 simple:         ID ASSIGN expressions
+                {
+                    if(s_table.lookup($1)==0)
+                    {
+                        printf("ERROR: %s not declare\n",$1);
+                    }
+                    else if(s_table.table[$1].masterType==is_constant)
+                    {
+                        printf("ERROR %s is constant unable to assign\n",$1);
+                    }
+                    else if(s_table.table[$1].type!=$3)
+                    {
+                        printf("ERROR: %s assign type error\n",$1);
+                    }
+                }
                 |PUT expressions
                 |GET expressions
                 |RESULT expressions
@@ -211,30 +224,35 @@ expressions:    '-' expressions %prec NEGATIVE
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '*' type error");
-                    $$=$1;
+                    else
+                        $$=$1;
                 }
                 |expressions '/' expressions
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '/' type error");
-                    $$=$1;
+                    else
+                        $$=$1;
                 }
                 |expressions MOD expressions{
                     if($1!=$3)
                         yyerror("ERROR: expression '%' type error");
-                    $$=$1;
+                    else
+                        $$=$1;
                 }
                 |expressions '+' expressions
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '+' type error");
-                    $$=$1;
+                    else
+                        $$=$1;
                 }
                 |expressions '-' expressions
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '-' type error");
-                    $$=$1;
+                    else
+                        $$=$1;
                 }
                 |bool_expression    {$$=$1;}
                 |const_exp          {$$=$1;}
@@ -244,13 +262,26 @@ expressions:    '-' expressions %prec NEGATIVE
                     {
                         yyerror("ERROR: ID not found");
                     }
+                    else if(s_table.table[$1].stackNum!=0 && s_table.table[$1].stackNum!=currentStack)
+                    {
+                        printf("ERROR: %s is unable to reach\n",$1);
+                    }
+                    else
+                        $$=s_table.table[$1].type;
                 }
                 |ID
                 {
-                if(s_table.lookup($1)==0)
+                    if(s_table.lookup($1)==0)
                     {
                         yyerror("ERROR: ID not found");
                     }
+                    else if(s_table.table[$1].stackNum!=0 && s_table.table[$1].stackNum!=currentStack)
+                    {
+
+                        printf("ERROR: %s stack: %d is unable to reach\n",$1,currentStack);
+                    }
+                    else
+                        $$=s_table.table[$1].type;
                 }
                 ;
 const_exp:      INT_NUMBER      {$$=$1;}
@@ -329,6 +360,20 @@ function_invocation:    ID '(' ')'
                             }
                         }
                         |ID '(' functionInputA functionInputB ')'
+                        {
+                            if(s_table.lookup($1)==0)
+                            {
+                                yyerror("ERROR: function not declare");
+                            }
+                            else if(s_table.table[$1].masterType!=is_func)
+                            {
+                                printf("ERROR: %s is not function\n",$1);
+                            }
+                            else
+                            {
+                                $$=s_table.table[$1].type;
+                            }
+                        }
                         ;
 functionInputA:     expressions
                     ;

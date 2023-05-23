@@ -43,7 +43,6 @@ enum dataType
 
 };
 
-
 bool isNumeric(std::string const &str)
 {
     auto it = str.begin();
@@ -102,11 +101,11 @@ void symbolTable::insert(const string symbol, const dataType _type, master_type 
 {
     if (lookup(symbol) != 0)
     {
-        cout << "symbolTable ERROR: ID redefine" << endl;
+        cout << "symbolTable insert ERROR: " << symbol << " redefine" << endl;
         return;
     }
     table[symbol].type = _type;
-    table[symbol].masterType = is_constant;
+    table[symbol].masterType = _masterType;
     table[symbol].stackNum = _stackNum;
     cout << symbol << " is inserted" << endl;
 }
@@ -128,7 +127,24 @@ void symbolTable::dump()
     {
         cout << a.first << "\t\t";
 
-        cout << typeString[a.second.type]<<"\t\t"<<a.second.stackNum << endl;
+        if (a.second.masterType == is_constant)
+        {
+            cout << "const ";
+        }
+
+        else if (a.second.masterType == is_func)
+        {
+            cout << "function ";
+        }
+
+        else if (a.second.masterType == is_arr)
+        {
+            cout << "array ";
+        }
+        else
+            cout << "normal ";
+
+        cout << typeString[a.second.type] << "\t\t" << a.second.stackNum << endl;
     }
 }
 
