@@ -24,14 +24,14 @@ symbolData data;
     char dataIdentity[256];
 }
 
-%token <dType> REAL INT STRING BOOL
+%token <dType> REAL INT STRING BOOL 
 %token <dataIdentity> ID TRUE FALSE INT_NUMBER REAL_NUMBER STR
 %token <isConst> CONST VAR
 
 %type <dataIdentity> expressions 
 %type <dataIdentity> bool_expression
 %type <dataIdentity> const_exp
-%type <dType> Types Type
+%type <dType> Types Type array function_invocation
 
 /* tokens */
 %token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN 
@@ -80,13 +80,13 @@ constant:       CONST ID ':' Type ASSIGN const_exp
                         sprintf(errorMSG,"%s redefine",$2);
                         yyerror(errorMSG);
                     }
-                    if($4!=getType($6,0))
+                    if($4!=currentTable.getType($6,0))
                     {
                         yyerror("invalid assign");
                     }
                     else
                     {
-                        currentTable.insert($2,getType($6,1),$6);
+                        currentTable.insert($2,currentTable.getType($6,1),$6);
                     }
                 }
                 |CONST ID ASSIGN const_exp
@@ -100,7 +100,7 @@ constant:       CONST ID ':' Type ASSIGN const_exp
                     }
                     else
                     {
-                        currentTable.insert($2,getType($4,1),$4);
+                        currentTable.insert($2,currentTable.getType($4,1),$4);
                     }
                 }
                 ;
@@ -116,14 +116,7 @@ variable:       VAR ID ':' Type
                     }
                     else
                     {
-                        if($4==0)
-                            currentTable.insert($2,type_int,"");
-                        else if($4==1)
-                            currentTable.insert($2,type_real,"");
-                        else if($4==2)
-                            currentTable.insert($2,type_string,"");
-                        else if($4==3)
-                            currentTable.insert($2,type_bool,"");
+                        currentTable.insert($2,intToType($4),"");
                     }
                 }
                 |VAR ID ASSIGN const_exp
@@ -138,7 +131,7 @@ variable:       VAR ID ':' Type
                     else
                     {
                         if($4==0)
-                            currentTable.insert($2,getType($4,0),$4);
+                            currentTable.insert($2,currentTable.getType($4,0),$4);
                     }
                 }
 
@@ -154,30 +147,47 @@ variable:       VAR ID ':' Type
                         sprintf(errorMSG,"%s redefine",$2);
                         yyerror(errorMSG);
                     }
-                    else if($4!=getType($6,0))
+                    else if($4!=currentTable.getType($6,0))
                     {
                         yyerror("invalid assign");
                     }
                     else
                     {
                         printf("%s\n",$6);
-                        if($4==0)
-                            currentTable.insert($2,type_int,$6);
-                        else if($4==1)
-                            currentTable.insert($2,type_real,$6);
-                        else if($4==2)
-                            currentTable.insert($2,type_string,$6);
-                        else if($4==3)
-                            currentTable.insert($2,type_bool,$6);
+                        currentTable.insert($2,intToType($4),$6);
+                        // if($4==0)
+                        //     currentTable.insert($2,type_int,$6);
+                        // else if($4==1)
+                        //     currentTable.insert($2,type_real,$6);
+                        // else if($4==2)
+                        //     currentTable.insert($2,type_string,$6);
+                        // else if($4==3)
+                        //     currentTable.insert($2,type_bool,$6);
                     }
                 }
                 ;
 
-Types:          Type    
-                |array
+Types:          Type    {$$=$1;}  
+                |array  {$$=$1;}  
                 ;
 
 array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF Type
+                {
+                    if(currentTable.getType($6,0)!=currentTable.getType($9,0))
+                    {
+                        yyerror("ERROR: array declare error");
+                    }
+                    else
+                    {
+                        char temp[256]={'\0'};
+                        strcat(temp,$6);
+                        strcat(temp,",");
+                        strcat(temp,$9);
+
+                        currentTable.insert($2,type_array,temp);
+                    }
+                    $$=$11;
+                }
                 ;
 
 Type:           BOOL        {$$=$1;}
@@ -189,6 +199,9 @@ Type:           BOOL        {$$=$1;}
 function:       FUNCTION ID '(' ')' ':' Types
                 contents
                 END ID
+                {
+                    
+                }
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' Types
                 contents
                 END ID
