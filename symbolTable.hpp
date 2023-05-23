@@ -43,20 +43,6 @@ enum dataType
 
 };
 
-dataType intToType(int number)
-{
-    switch (number)
-    {
-    case 0:
-        return type_int;
-    case 1:
-        return type_real;
-    case 2:
-        return type_string;
-    case 3:
-        return type_bool;
-    }
-}
 
 bool isNumeric(std::string const &str)
 {
@@ -80,10 +66,11 @@ class symbolData
 public:
     dataType type;
     master_type masterType;
+    int stackNum;
 
     string stringVal;
     double realVal;
-    functionData f_data;
+    functionData fData;
 };
 
 class symbolTable
@@ -111,7 +98,7 @@ bool symbolTable::lookup(const string &symbol)
         return 1;
 }
 
-void symbolTable::insert(const string symbol, const dataType _type, master_type _masterType, int stackNum)
+void symbolTable::insert(const string symbol, const dataType _type, master_type _masterType, int _stackNum)
 {
     if (lookup(symbol) != 0)
     {
@@ -120,6 +107,7 @@ void symbolTable::insert(const string symbol, const dataType _type, master_type 
     }
     table[symbol].type = _type;
     table[symbol].masterType = is_constant;
+    table[symbol].stackNum = _stackNum;
     cout << symbol << " is inserted" << endl;
 }
 
@@ -131,41 +119,32 @@ void symbolTable::dump()
 
     cout << "ID"
          << "\t\t"
-         << "type" << endl;
-    //  << "type" << endl;
+         << "type"
+         << "\t\t"
+         << "stack"
+         << endl;
+
     for (auto &a : table)
     {
         cout << a.first << "\t\t";
 
-        cout << typeString[a.second.type] << endl;
+        cout << typeString[a.second.type]<<"\t\t"<<a.second.stackNum << endl;
     }
 }
 
-// dataType symbolTable::getType(const string &symbol, bool isConst)
-// {
-//     if (isConst)
-//     {
-//         if (symbol[0] == '\"')
-//             return type_const_string;
-//         if (symbol.find('.') != -1)
-//             return type_const_real;
-//         if (isNumeric(symbol))
-//             return type_const_int;
-//         if (symbol == "true" || symbol == "false")
-//             return type_const_bool;
-//     }
-//     else
-//     {
-//         if (symbol[0] == '\"')
-//             return type_string;
-//         if (symbol.find('.') != -1)
-//             return type_real;
-//         if (isNumeric(symbol))
-//             return type_int;
-//         if (symbol == "true" || symbol == "false")
-//             return type_bool;
-//     }
-//     return table[symbol].type;
-// }
+dataType intToType(int number)
+{
+    switch (number)
+    {
+    case 0:
+        return type_int;
+    case 1:
+        return type_real;
+    case 2:
+        return type_string;
+    case 3:
+        return type_bool;
+    }
+}
 
 #endif

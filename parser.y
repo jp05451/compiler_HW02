@@ -1,6 +1,5 @@
 %{
 #include<string.h>
-#include<math.h>
 #include "lex.yy.cpp"
 #include "symbolTable.hpp"
 
@@ -8,8 +7,7 @@
 #define Trace(t)        printf(t)
 // int yylex();
 void yyerror(char *);
-symbolTable currentTable;
-vector<symbolTable> tableList;
+symbolTable s_table;
 int currentStack=0;
 int stackNumber=0;
 %}
@@ -72,32 +70,32 @@ constant:       CONST ID ':' Type ASSIGN expressions
                 {
                     if($4!=$6)
                         yyerror("ERROR: const assign type error");
-                    currentTable.insert($2,intToType($4),is_constant,currentStack);
+                    s_table.insert($2,intToType($4),is_constant,currentStack);
                 }
                 
                 |CONST ID ASSIGN expressions
                 {
                     // if($4!=$6)
                     //     yyerror("ERROR: const assign type error");
-                    currentTable.insert($2,intToType($4),is_constant,currentStack);
+                    s_table.insert($2,intToType($4),is_constant,currentStack);
                 }
                 ;
 
 variable:       VAR ID ':' Type
                 {
-                    currentTable.insert($2,intToType($4),is_normal,currentStack);
+                    s_table.insert($2,intToType($4),is_normal,currentStack);
                 }
                 |VAR ID ASSIGN const_exp
                 {
                     // if($4!=$6)
                     //     yyerror("ERROR: const assign type error");
-                    currentTable.insert($2,intToType($4),is_normal,currentStack);
+                    s_table.insert($2,intToType($4),is_normal,currentStack);
                 }
                 |VAR ID ':' Type ASSIGN const_exp
                 {
                     if($4!=$6)
                         yyerror("ERROR: const assign type error");
-                    currentTable.insert($2,intToType($4),is_normal,currentStack);
+                    s_table.insert($2,intToType($4),is_normal,currentStack);
                 }
                 
                 ;
@@ -108,7 +106,7 @@ Types:          Type    {$$=$1;}
 
 array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF Type
                 {
-                    // currentTable.insert($2,)
+                    s_table.insert($2,intToType($11),is_arr,currentStack);
                 }
                 ;
 
@@ -120,7 +118,8 @@ Type:           BOOL        {$$=$1;}
 
 function:       FUNCTION ID '(' ')' ':' Types
                 {
-                    currentTable.insert($2,intToType($6),is_func,0);
+                    s_table.insert($2,intToType($6),is_func,0);
+                    s_table.table[$2].fData.varNumber=0;
                     currentStack=++stackNumber;
                 }
                 contents
@@ -129,13 +128,23 @@ function:       FUNCTION ID '(' ')' ':' Types
                     currentStack=0;
                 }
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' Types
+                {
+                    s_table.insert($2,intToType($8),is_func,0);
+                    currentStack=++stackNumber;
+                }
                 contents
                 END ID
+                {
+                    currentStack=0;
+                }
                 ;
 
 
 
 functionVarA:   ID ':' Type
+                {
+                    s_table.insert($1,intToType($3),is_normal,currentStack);
+                }
                 |array
                 ;
 
@@ -201,44 +210,44 @@ expressions:    '-' expressions %prec NEGATIVE
                 |expressions '*' expressions
                 {
                     if($1!=$3)
-                        yyerror("ERROR: type error");
+                        yyerror("ERROR: expression '*' type error");
                     $$=$1;
                 }
                 |expressions '/' expressions
                 {
                     if($1!=$3)
-                        yyerror("ERROR: type error");
+                        yyerror("ERROR: expression '/' type error");
                     $$=$1;
                 }
                 |expressions MOD expressions{
                     if($1!=$3)
-                        yyerror("ERROR: type error");
+                        yyerror("ERROR: expression '%' type error");
                     $$=$1;
                 }
                 |expressions '+' expressions
                 {
                     if($1!=$3)
-                        yyerror("ERROR: type error");
+                        yyerror("ERROR: expression '+' type error");
                     $$=$1;
                 }
                 |expressions '-' expressions
                 {
                     if($1!=$3)
-                        yyerror("ERROR: type error");
+                        yyerror("ERROR: expression '-' type error");
                     $$=$1;
                 }
                 |bool_expression    {$$=$1;}
                 |const_exp          {$$=$1;}
                 |ID '[' INT ']'
                 {
-                    if(currentTable.lookup($1)==0)
+                    if(s_table.lookup($1)==0)
                     {
                         yyerror("ERROR: ID not found");
                     }
                 }
                 |ID
                 {
-                if(currentTable.lookup($1)==0)
+                if(s_table.lookup($1)==0)
                     {
                         yyerror("ERROR: ID not found");
                     }
@@ -254,37 +263,37 @@ bool_expression:    '(' bool_expression ')'             {$$=$2;}
                     |expressions '<' expressions   
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression '<' type error");
                     $$=type_bool;
                     }     
                     |expressions LESS_EQUAL expressions
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression '<=' type error");
                     $$=type_bool;
                     }     
                     |expressions '=' expressions
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression '=' type error");
                     $$=type_bool;
                     }     
                     |expressions MORE_EQUAL expressions
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression '>=' type error");
                     $$=type_bool;
                     }     
                     |expressions '>' expressions
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression '>' type error");
                     $$=type_bool;
                     }     
                     |expressions NOT_EQUAL expressions
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression '!=' type error");
                     $$=type_bool;
                     }     
                     |NOT expressions
@@ -294,17 +303,31 @@ bool_expression:    '(' bool_expression ')'             {$$=$2;}
                     |expressions AND expressions
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression 'AND' type error");
                     $$=type_bool;
                     }     
                     |expressions OR expressions
                     {
                     if($1!=$3)
-                        yyerror("ERROR:bool_expression type error");
+                        yyerror("ERROR:bool_expression 'OR' type error");
                     $$=type_bool;
                     }     
                     ;
 function_invocation:    ID '(' ')' 
+                        {
+                            if(s_table.lookup($1)==0)
+                            {
+                                yyerror("ERROR: function not declare");
+                            }
+                            else if(s_table.table[$1].masterType!=is_func)
+                            {
+                                printf("ERROR: %s is not function\n",$1);
+                            }
+                            else
+                            {
+                                $$=s_table.table[$1].type;
+                            }
+                        }
                         |ID '(' functionInputA functionInputB ')'
                         ;
 functionInputA:     expressions
@@ -351,5 +374,5 @@ int main(int argc,char **argv)
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
-    currentTable.dump();
+    s_table.dump();
 }
