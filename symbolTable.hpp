@@ -20,7 +20,16 @@ string typeString[] = {
     "bool",
     "array",
     // function
-    "function"};
+    "function"
+};
+
+enum master_type
+{
+    is_normal,
+    is_arr,
+    is_constant,
+    is_func
+};
 
 enum dataType
 {
@@ -47,10 +56,10 @@ dataType intToType(int number)
         return type_string;
     case 3:
         return type_bool;
-    case 4:
-        return type_array;
-    case 5:
-        return type_function;
+    // case 4:
+    //     return type_array;
+    // case 5:
+    //     return type_function;
     }
 }
 
@@ -68,14 +77,15 @@ class functionData
 {
 public:
     int varNumber=0;
-    dataType returnType;
+    vector<dataType> functionVar;
 };
 
 class symbolData
 {
 public:
     dataType type;
-    bool isConst;
+    master_type masterType;
+
     string stringVal;
     double realVal;
     functionData f_data;
@@ -94,7 +104,7 @@ public:
     void creat();
     // unordered_map<string, symbolData>::iterator &lookup(const string &symbol);
     bool lookup(const string &symbol);
-    void insert(const string, const dataType,bool);
+    void insert(const string, const dataType,master_type,int);
     void dump();
     dataType getType(const string &, bool);
 
@@ -118,7 +128,7 @@ bool symbolTable::lookup(const string &symbol)
         return 1;
 }
 
-void symbolTable::insert(const string symbol, const dataType _type,bool _isConst)
+void symbolTable::insert(const string symbol, const dataType _type,master_type _masterType,int stackNum)
 {
     if(lookup(symbol)!=0)
     {
@@ -126,7 +136,7 @@ void symbolTable::insert(const string symbol, const dataType _type,bool _isConst
         return;
     }
     table[symbol].type = _type;
-    table[symbol].isConst = _isConst;
+    table[symbol].masterType = is_constant;
     cout << symbol << " is inserted" << endl;
 }
 
@@ -143,7 +153,7 @@ void symbolTable::dump()
     for (auto &a : table)
     {
         cout << a.first << "\t\t";
-        a.second.isConst ? cout << "const " : cout << "";
+        
         cout << typeString[a.second.type] << endl;
     }
 }
