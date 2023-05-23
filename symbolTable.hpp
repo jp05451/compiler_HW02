@@ -20,8 +20,7 @@ string typeString[] = {
     "bool",
     "array",
     // function
-    "function"
-};
+    "function"};
 
 enum master_type
 {
@@ -56,10 +55,6 @@ dataType intToType(int number)
         return type_string;
     case 3:
         return type_bool;
-    // case 4:
-    //     return type_array;
-    // case 5:
-    //     return type_function;
     }
 }
 
@@ -76,7 +71,7 @@ bool isNumeric(std::string const &str)
 class functionData
 {
 public:
-    int varNumber=0;
+    int varNumber = 0;
     vector<dataType> functionVar;
 };
 
@@ -94,30 +89,18 @@ public:
 class symbolTable
 {
 public:
-    symbolTable()
-    {
-    }
-    ~symbolTable() 
-    {
-        
-    }
+    symbolTable() {}
+    ~symbolTable() {}
     void creat();
-    // unordered_map<string, symbolData>::iterator &lookup(const string &symbol);
     bool lookup(const string &symbol);
-    void insert(const string, const dataType,master_type,int);
+    void insert(const string, const dataType, master_type, int);
     void dump();
-    dataType getType(const string &, bool);
+    // dataType getType(const string &, bool);
 
-    // private:
-    // vector<vector<string>> table;
     unordered_map<string, symbolData> table;
-    // unordered_map<int, set<string>> table;
 };
 
-void symbolTable::creat()
-{
-    // table.resize(1);
-}
+void symbolTable::creat() {}
 
 bool symbolTable::lookup(const string &symbol)
 {
@@ -128,9 +111,9 @@ bool symbolTable::lookup(const string &symbol)
         return 1;
 }
 
-void symbolTable::insert(const string symbol, const dataType _type,master_type _masterType,int stackNum)
+void symbolTable::insert(const string symbol, const dataType _type, master_type _masterType, int stackNum)
 {
-    if(lookup(symbol)!=0)
+    if (lookup(symbol) != 0)
     {
         cout << "symbolTable ERROR: ID redefine" << endl;
         return;
@@ -153,36 +136,36 @@ void symbolTable::dump()
     for (auto &a : table)
     {
         cout << a.first << "\t\t";
-        
+
         cout << typeString[a.second.type] << endl;
     }
 }
 
-dataType symbolTable::getType(const string &symbol, bool isConst)
-{
-    // if (isConst)
-    // {
-    //     if (symbol[0] == '\"')
-    //         return type_const_string;
-    //     if (symbol.find('.') != -1)
-    //         return type_const_real;
-    //     if (isNumeric(symbol))
-    //         return type_const_int;
-    //     if (symbol == "true" || symbol == "false")
-    //         return type_const_bool;
-    // }
-    // else
-    // {
-    //     if (symbol[0] == '\"')
-    //         return type_string;
-    //     if (symbol.find('.') != -1)
-    //         return type_real;
-    //     if (isNumeric(symbol))
-    //         return type_int;
-    //     if (symbol == "true" || symbol == "false")
-    //         return type_bool;
-    // }
-    // return table[symbol].type;
-}
+// dataType symbolTable::getType(const string &symbol, bool isConst)
+// {
+//     if (isConst)
+//     {
+//         if (symbol[0] == '\"')
+//             return type_const_string;
+//         if (symbol.find('.') != -1)
+//             return type_const_real;
+//         if (isNumeric(symbol))
+//             return type_const_int;
+//         if (symbol == "true" || symbol == "false")
+//             return type_const_bool;
+//     }
+//     else
+//     {
+//         if (symbol[0] == '\"')
+//             return type_string;
+//         if (symbol.find('.') != -1)
+//             return type_real;
+//         if (isNumeric(symbol))
+//             return type_int;
+//         if (symbol == "true" || symbol == "false")
+//             return type_bool;
+//     }
+//     return table[symbol].type;
+// }
 
 #endif
