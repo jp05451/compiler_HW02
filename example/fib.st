@@ -5,7 +5,7 @@
 const  n: int := 8
 
 % iterative function
-function itFibonacci (aaa: int,bbb:real,ccc:array 1..100 of int) : int
+function itFibonacci (aaa: int,bbb:real) : int
   var Fn: int
   var FNminus1: int
   var temp: int
@@ -29,5 +29,5 @@ put "N: "
 put n
 skip
 put "Result of iterative computation:  "
-put itFibonacci(n)
+put itFibonacci(1,1.2)
 

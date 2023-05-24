@@ -10,6 +10,9 @@
 //#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",#t,i);}
 #define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",#t,i); return t;}
 
+//#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",#t,i);}
+#define tokenReal(t,i) {LIST; printf("<%s:%f>\n",#t,i); return t;}
+
 
 //#define tokenString(t,s) {LIST; printf("<%s:%s>\n",#t,s);}
 #define tokenString(t,s) {LIST; printf("<%s:%s>\n",#t,s); return t;}
@@ -132,9 +135,11 @@ when            {token(WHEN);}
 }
 {numerical}     {
                 double doubleNumber;
-                sscanf(yytext,"%f",&doubleNumber);
+                // printf("%s\n",yytext);
+                sscanf(yytext,"%lf",&doubleNumber);
+                printf("%f\n",doubleNumber);
                 yylval.dType=type_real;
-                tokenInteger(REAL_NUMBER,doubleNumber);
+                tokenReal(REAL_NUMBER,doubleNumber);
                 }
 
 

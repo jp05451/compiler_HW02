@@ -43,6 +43,13 @@ enum dataType
 
 };
 
+typedef struct funcVar
+{
+    string varID;
+    dataType funcVarType;
+    bool isArray;
+} funcVar;
+
 bool isNumeric(std::string const &str)
 {
     auto it = str.begin();
@@ -82,6 +89,7 @@ public:
     void insert(const string, const dataType, master_type, int);
     void insertStack(int, int);
     bool canAccess(const string &, int);
+    bool funcVarCorrect(string funcName, vector<funcVar> &inputVar);
     void dump();
     // dataType getType(const string &, bool);
 
@@ -126,6 +134,7 @@ void symbolTable::insertStack(int lastStack, int currentStack)
             if (canBeAccess != eachSymbol.second.stackNum.end())
             {
                 eachSymbol.second.stackNum.push_back(currentStack);
+                cout<<eachSymbol.first <<" can be access at stack "<<currentStack<<endl;
             }
         }
     }
@@ -205,6 +214,23 @@ dataType intToType(int number)
     case 3:
         return type_bool;
     }
+}
+
+bool symbolTable::funcVarCorrect(string funcName, vector<funcVar> &inputVar)
+{
+    if(lookup(funcName)==0)
+    {
+        cout << "ERROR: funcName " << funcName << " undeclare" << endl;
+        return 0;
+    }
+    if(inputVar.size()!=table[funcName].fData.varNumber)
+        return 0;
+    for (int i = 0; i < inputVar.size();i++)
+    {
+        if(table[funcName].fData.functionVar[i]!=inputVar[i].funcVarType)
+            return 0;
+    }
+    return 1;
 }
 
 #endif

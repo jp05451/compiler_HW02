@@ -11,14 +11,13 @@ symbolTable s_table;
 int currentStack=0;
 int stackNumber=0;
 
-typedef
-struct funcVar
-{
-    // char varID[256]={};
-    string varID;
-    dataType funcVarType;
-    bool isArray;
-}funcVar;
+// typedef struct funcVar
+// {
+//     string varID;
+//     dataType funcVarType;
+//     bool isArray;
+// }
+// funcVar;
 
 vector<funcVar> functionVariable;
 stack<int> scopeStack;
@@ -135,7 +134,7 @@ function:       FUNCTION ID '(' ')' ':' Types
                 {
                     s_table.insert($2,intToType($6),is_func,0);
                     s_table.table[$2].fData.varNumber=0;
-                    currentStack=++stackNumber;
+                    currentStack=++stackNumber;    
                 }
                 contents
                 END ID
@@ -151,8 +150,12 @@ function:       FUNCTION ID '(' ')' ':' Types
                     for(auto &fVar:functionVariable)
                     {
                         s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
+                        //insert variable in functionData
+
                         s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
+                        //insert variable to symbolTable
                     }
+                    s_table.table[$2].fData.varNumber=functionVariable.size();
 
                 }
                 contents
@@ -226,9 +229,12 @@ procedure:      PROCEDURE ID '(' ')'
                     for(auto &fVar:functionVariable)
                     {
                         s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
-                        s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
-                    }
+                        //insert variable to function Data
 
+                        s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
+                        //insert variable to symbolTable
+                    }
+                    s_table.table[$2].fData.varNumber=functionVariable.size();
                 }
                 contents
                 END ID
@@ -462,9 +468,15 @@ function_invocation:    ID '(' ')'
                             {
                                 yyerror("ERROR: function not declare");
                             }
-                            else if(s_table.table[$1].masterType!=is_func)
+                            if(s_table.table[$1].masterType!=is_func)
                             {
                                 printf("ERROR: %s is not function\n",$1);
+                            }
+                            
+
+                            if(s_table.funcVarCorrect($1,functionVariable)==0)
+                            {
+                                printf("ERROR: function %s input error\n",$1);
                             }
                             else
                             {
@@ -473,8 +485,20 @@ function_invocation:    ID '(' ')'
                         }
                         ;
 functionInputA:     expressions
+                    {
+                        funcVar temp;
+                        temp.funcVarType=intToType($1);
+                        temp.isArray=0;
+                        functionVariable.push_back(temp);
+                    }
                     ;
 functionInputB:     functionInputB ',' expressions
+                    {
+                        funcVar temp;
+                        temp.funcVarType=intToType($3);
+                        temp.isArray=0;
+                        functionVariable.push_back(temp);
+                    }
                     |
                     ;
 
