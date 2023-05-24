@@ -5,7 +5,7 @@
 const  n: int := 8
 
 % iterative function
-function itFibonacci (n: int) : int
+function itFibonacci (aaa: int,bbb:real,ccc:array 1..100 of int) : int
   var Fn: int
   var FNminus1: int
   var temp: int

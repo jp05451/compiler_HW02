@@ -14,6 +14,8 @@ int stackNumber=0;
 typedef
 struct funcVar
 {
+    // char varID[256]={};
+    string varID;
     dataType funcVarType;
     bool isArray;
 }funcVar;
@@ -139,14 +141,22 @@ function:       FUNCTION ID '(' ')' ':' Types
                 }
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' Types
                 {
-                    // printf("HAHAHA\n");
+                    // s_table.insert($2,intToType($9),is_func,0);
+                    // {currentStack=++stackNumber;}
                     s_table.insert($2,intToType($8),is_func,0);
                     currentStack=++stackNumber;
+                    for(auto &fVar:functionVariable)
+                    {
+                        s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
+                        s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
+                    }
+
                 }
                 contents
                 END ID
                 {
                     currentStack=0;
+                    functionVariable.clear();
                 }
                 ;
 
@@ -154,16 +164,18 @@ function:       FUNCTION ID '(' ')' ':' Types
 
 functionVarA:   ID ':' Type
                 {
-                    s_table.insert($1,intToType($3),is_normal,currentStack);
+                    // s_table.insert($1,intToType($3),is_normal,currentStack);
                     funcVar temp;
+                    temp.varID=$1;
                     temp.funcVarType=intToType($3);
                     temp.isArray=0;
                     functionVariable.push_back(temp);
                 }
                 |ID ':' ARRAY const_exp '.' '.' const_exp OF Type
                 {
-                    s_table.insert($1,intToType($9),is_arr,currentStack);
+                    // s_table.insert($1,intToType($9),is_arr,currentStack);
                     funcVar temp;
+                    temp.varID=$1;
                     temp.funcVarType=intToType($9);
                     temp.isArray=1;
                     functionVariable.push_back(temp);
@@ -172,16 +184,18 @@ functionVarA:   ID ':' Type
 
 functionVarB:   functionVarB ',' ID ':' Type
                 {
-                    s_table.insert($3,intToType($5),is_normal,currentStack);
+                    // s_table.insert($3,intToType($5),is_normal,currentStack);
                     funcVar temp;
+                    temp.varID=$3;
                     temp.funcVarType=intToType($5);
                     temp.isArray=0;
                     functionVariable.push_back(temp);
                 }
                 |functionVarB ',' ID ':' ARRAY const_exp '.' '.' const_exp OF Type
                 {
-                    s_table.insert($3,intToType($11),is_arr,currentStack);
+                    // s_table.insert($3,intToType($11),is_arr,currentStack);
                     funcVar temp;
+                    temp.varID=$3;
                     temp.funcVarType=intToType($11);
                     temp.isArray=1;
                     functionVariable.push_back(temp);
