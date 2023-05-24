@@ -146,7 +146,11 @@ when            {token(WHEN);}
                                 BEGIN(STRING_STATE);
                         }
 
-<STRING_STATE>\n        {printf("Bad Charactor\n");linenum++;} 
+<STRING_STATE>\n        {
+                        printf("Bad Charactor\n");      
+                        linenum++;        
+                        exit(-1);
+                        } 
 
 
 

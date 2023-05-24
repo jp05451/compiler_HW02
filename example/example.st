@@ -11,7 +11,7 @@ function add (a: int, b: int) : int
   var bbb:string
   loop
     var loopVar:real
-    bbb:="asdf"
+    bbb:="asdf""
   end loop
   result a+b
 end add
