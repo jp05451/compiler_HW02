@@ -10,6 +10,8 @@ void yyerror(char *);
 symbolTable s_table;
 int currentStack=0;
 int stackNumber=0;
+
+vector<dataType> functionVariable;
 %}
 
 
@@ -26,7 +28,7 @@ int stackNumber=0;
 %type <dType> expressions 
 %type <dType> bool_expression
 %type <dType> const_exp
-%type <dType> Types Type array function_invocation
+%type <dType> Types Type array function_invocation functionVarA functionVarB
 
 /* tokens */
 %token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN CONST 
@@ -145,11 +147,16 @@ function:       FUNCTION ID '(' ')' ':' Types
 functionVarA:   ID ':' Type
                 {
                     s_table.insert($1,intToType($3),is_normal,currentStack);
+                    functionVariable.push_back(intToType($3));
                 }
                 |array
                 ;
 
 functionVarB:   functionVarB ',' ID ':' Type
+                {
+                    s_table.insert($1,intToType($3),is_normal,currentStack);
+                    functionVariable.push_back(intToType($5))
+                }
                 |
                 ;
 
