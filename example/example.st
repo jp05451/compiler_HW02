@@ -8,7 +8,7 @@ var c: int
 
 % function declaration
 function add (a: int, b: int) : int
-  var asdf:string
+  var bbb:string
   result a+b
 end add
 
