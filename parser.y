@@ -81,7 +81,8 @@ constant:       CONST ID ':' Type ASSIGN expressions
                 {
                     if($4!=$6)
                         yyerror("ERROR: const assign type error");
-                    s_table.insert($2,intToType($4),is_constant,currentStack);
+                    else
+                         s_table.insert($2,intToType($4),is_constant,currentStack);
                 }
                 
                 |CONST ID ASSIGN expressions
@@ -204,11 +205,35 @@ functionVarB:   functionVarB ',' ID ':' Type
                 ;
 
 procedure:      PROCEDURE ID '(' ')'
+                {
+                    s_table.insert($2,type_null,is_func,0);
+                    currentStack=++stackNumber;
+
+                }
                 contents
                 END ID
+                {
+                    currentStack=0;
+                }
                 |PROCEDURE ID '(' functionVarA functionVarB ')'
+                {
+                    // s_table.insert($2,intToType($9),is_func,0);
+                    // {currentStack=++stackNumber;}
+                    s_table.insert($2,type_null,is_func,0);
+                    currentStack=++stackNumber;
+                    for(auto &fVar:functionVariable)
+                    {
+                        s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
+                        s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
+                    }
+
+                }
                 contents
                 END ID
+                {
+                    currentStack=0;
+                    functionVariable.clear();
+                }
                 ;
 
 contents:       contents content
@@ -309,6 +334,7 @@ expressions:    '-' expressions %prec NEGATIVE
                 }
                 |bool_expression    {$$=$1;}
                 |const_exp          {$$=$1;}
+                |function_invocation
                 |ID '[' INT ']'
                 {
                     if(s_table.lookup($1)==0)

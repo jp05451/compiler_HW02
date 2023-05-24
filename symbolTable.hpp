@@ -32,14 +32,15 @@ enum master_type
 
 enum dataType
 {
-    type_null = -1,
     type_int,
     type_real,
     type_string,
     type_bool,
     type_array,
     // funcion
-    type_function
+    type_function,
+    type_null
+
 
 };
 
@@ -141,7 +142,7 @@ void symbolTable::dump()
         {
             cout << "array ";
         }
-        else
+        else 
             cout << "normal ";
 
         cout << typeString[a.second.type] << "\t\t" << a.second.stackNum << endl;
