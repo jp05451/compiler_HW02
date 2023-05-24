@@ -108,7 +108,7 @@ void symbolTable::insert(const string symbol, const dataType _type, master_type 
     table[symbol].type = _type;
     table[symbol].masterType = _masterType;
     table[symbol].stackNum = _stackNum;
-    cout << symbol << " is inserted" << endl;
+    cout << symbol << " is inserted in stack "<< _stackNum<< endl;
 }
 
 void symbolTable::dump()
@@ -127,7 +127,6 @@ void symbolTable::dump()
     for (auto &a : table)
     {
         cout << a.first << "\t\t";
-
         if (a.second.masterType == is_constant)
         {
             cout << "const ";
@@ -146,6 +145,7 @@ void symbolTable::dump()
             cout << "normal ";
 
         cout << typeString[a.second.type] << "\t\t" << a.second.stackNum << endl;
+       
     }
 }
 

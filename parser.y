@@ -475,15 +475,8 @@ functionInputB:     functionInputB ',' expressions
 
 conditional:    IF bool_expression THEN
                 {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
                 }
                 contents
                 ELSE
@@ -502,15 +495,8 @@ conditional:    IF bool_expression THEN
                 }
                 |IF bool_expression THEN
                 {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
                 }
                 contents
                 END IF
@@ -527,14 +513,75 @@ conditional:    IF bool_expression THEN
                 }
 
 loop:           LOOP
+                {
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                }
                 contents
                 END LOOP
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
+                }
                 |FOR ID ':' expressions  '.' '.' expressions
+                {
+                    if(s_table.lookup($2)==0)
+                    {
+                        printf("ERROR: for loop $s not found\n",$2);
+                    }
+                    if($4!=$7)
+                    {
+                        printf("ERROR: for loop range error\n");
+                    }
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                }
                 contents
                 END FOR
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
+                }
                 |FOR DECREASING ID ':' expressions  '.' '.' expressions
+                {
+                    if(s_table.lookup($3)==0)
+                    {
+                        printf("ERROR: for loop $s not found\n",$3);
+                    }
+                    if($5!=$8)
+                    {
+                        printf("ERROR: for loop range error\n");
+                    }
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                }
                 contents
                 END FOR
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
+                }
 
 %%
 

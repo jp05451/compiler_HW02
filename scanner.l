@@ -102,7 +102,10 @@ real            {
 result          {token(RESULT);}
 return          {token(RETURN);}
 skip            {token(SKIP);}
-string          {token(STRING);}
+string          {
+                yylval.dType=type_string;
+                token(STRING);
+                }
 then            {token(THEN);}
 true            {
                 // strcpy(yylval.dType,"true");
