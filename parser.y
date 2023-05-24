@@ -10,6 +10,7 @@ void yyerror(char *);
 symbolTable s_table;
 int currentStack=0;
 int stackNumber=0;
+stack<int> scopeStack;
 
 typedef
 struct funcVar
@@ -255,11 +256,23 @@ statment:       block
                 ;
 
 
-block:          BEG
-                content
-                END
+block:          BEG     
                 {
-                    
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                }
+                content
+                END     
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
                 }
                 ;
 
@@ -461,13 +474,57 @@ functionInputB:     functionInputB ',' expressions
                     ;
 
 conditional:    IF bool_expression THEN
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
+                }
                 contents
                 ELSE
                 content
                 END IF
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
+                }
                 |IF bool_expression THEN
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
+                }
                 contents
                 END IF
+                {
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
+                }
 
 loop:           LOOP
                 contents
