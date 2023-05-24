@@ -11,7 +11,14 @@ symbolTable s_table;
 int currentStack=0;
 int stackNumber=0;
 
-vector<dataType> functionVariable;
+typedef
+struct funcVar
+{
+    dataType funcVarType;
+    bool isArray;
+}funcVar;
+
+vector<funcVar> functionVariable;
 %}
 
 
@@ -106,9 +113,10 @@ Types:          Type    {$$=$1;}
                 |array  {$$=$1;}  
                 ;
 
-array:          VAR ID ':' ARRAY ':' const_exp '.' '.' const_exp OF Type
+array:          VAR ID ':' ARRAY  const_exp '.' '.' const_exp OF Type
                 {
-                    s_table.insert($2,intToType($11),is_arr,currentStack);
+                    s_table.insert($2,intToType($10),is_arr,currentStack);
+                    $$ = $10;
                 }
                 ;
 
@@ -147,15 +155,36 @@ function:       FUNCTION ID '(' ')' ':' Types
 functionVarA:   ID ':' Type
                 {
                     s_table.insert($1,intToType($3),is_normal,currentStack);
-                    functionVariable.push_back(intToType($3));
+                    funcVar temp;
+                    temp.funcVarType=intToType($3);
+                    temp.isArray=0;
+                    functionVariable.push_back(temp);
                 }
-                |array
+                |ID ':' ARRAY const_exp '.' '.' const_exp OF Type
+                {
+                    s_table.insert($1,intToType($9),is_arr,currentStack);
+                    funcVar temp;
+                    temp.funcVarType=intToType($9);
+                    temp.isArray=1;
+                    functionVariable.push_back(temp);
+                }
                 ;
 
 functionVarB:   functionVarB ',' ID ':' Type
                 {
-                    s_table.insert($1,intToType($3),is_normal,currentStack);
-                    functionVariable.push_back(intToType($5))
+                    s_table.insert($3,intToType($5),is_normal,currentStack);
+                    funcVar temp;
+                    temp.funcVarType=intToType($5);
+                    temp.isArray=0;
+                    functionVariable.push_back(temp);
+                }
+                |functionVarB ',' ID ':' ARRAY const_exp '.' '.' const_exp OF Type
+                {
+                    s_table.insert($3,intToType($11),is_arr,currentStack);
+                    funcVar temp;
+                    temp.funcVarType=intToType($11);
+                    temp.isArray=1;
+                    functionVariable.push_back(temp);
                 }
                 |
                 ;
@@ -190,6 +219,9 @@ statment:       block
 block:          BEG
                 content
                 END
+                {
+                    
+                }
                 ;
 
 simple:         ID ASSIGN expressions
