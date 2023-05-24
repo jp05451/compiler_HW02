@@ -11,13 +11,13 @@ function add (a: int, b: int) : int
   var bbb:string
   loop
     var loopVar:real
-    bbb:="asdf""
+    bbb:="asdf"""
   end loop
   result a+b
 end add
 
 % main block
-c := add(a, 10)
+c := add(a, 10.0)
 if (c > 10) then
   var aaa:int
   put -c

@@ -368,6 +368,7 @@ expressions:    '-' expressions %prec NEGATIVE
                     else if(s_table.canAccess($1,currentStack)==0)
                     {
                         printf("ERROR: %s is unable to reach\n",$1);
+                        $$=s_table.table[$1].type;
                     }
                     else
                         $$=s_table.table[$1].type;
@@ -382,6 +383,7 @@ expressions:    '-' expressions %prec NEGATIVE
                     {
 
                         printf("ERROR: %s stack: %d is unable to reach\n",$1,currentStack);
+                        $$=s_table.table[$1].type;
                     }
                     else
                         $$=s_table.table[$1].type;
@@ -456,6 +458,7 @@ function_invocation:    ID '(' ')'
                             else if(s_table.table[$1].masterType!=is_func)
                             {
                                 printf("ERROR: %s is not function\n",$1);
+                                $$=s_table.table[$1].type;
                             }
                             else
                             {
@@ -466,17 +469,18 @@ function_invocation:    ID '(' ')'
                         {
                             if(s_table.lookup($1)==0)
                             {
-                                yyerror("ERROR: function not declare");
+                                printf("ERROR: function %s not declare\n",$1);
                             }
-                            if(s_table.table[$1].masterType!=is_func)
+                            else if(s_table.table[$1].masterType!=is_func)
                             {
                                 printf("ERROR: %s is not function\n",$1);
-                            }
-                            
+                                $$=s_table.table[$1].type;
 
-                            if(s_table.funcVarCorrect($1,functionVariable)==0)
+                            }
+                            else if(s_table.funcVarCorrect($1,functionVariable)==0)
                             {
                                 printf("ERROR: function %s input error\n",$1);
+                                $$=s_table.table[$1].type;
                             }
                             else
                             {
