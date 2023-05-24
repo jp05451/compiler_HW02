@@ -41,7 +41,6 @@ enum dataType
     type_function,
     type_null
 
-
 };
 
 bool isNumeric(std::string const &str)
@@ -66,7 +65,7 @@ class symbolData
 public:
     dataType type;
     master_type masterType;
-    int stackNum;
+    vector<int> stackNum;
 
     string stringVal;
     double realVal;
@@ -81,6 +80,8 @@ public:
     void creat();
     bool lookup(const string &symbol);
     void insert(const string, const dataType, master_type, int);
+    void insertStack(int, int);
+    bool canAccess(const string &, int);
     void dump();
     // dataType getType(const string &, bool);
 
@@ -102,13 +103,32 @@ void symbolTable::insert(const string symbol, const dataType _type, master_type 
 {
     if (lookup(symbol) != 0)
     {
-        cout << "symbolTable insert ERROR: " << symbol << " redefine" << endl;
+        cout << " ERROR: symbolTable insert " << symbol << " redefine" << endl;
         return;
     }
     table[symbol].type = _type;
     table[symbol].masterType = _masterType;
-    table[symbol].stackNum = _stackNum;
-    cout << symbol << " is inserted in stack "<< _stackNum<< endl;
+    table[symbol].stackNum.push_back(_stackNum);
+    // insertStack(symbol, scopeStack.top(), _stackNum);
+    cout << symbol << " is inserted in stack " << _stackNum << endl;
+}
+
+void symbolTable::insertStack(int lastStack, int currentStack)
+{
+    for (auto &eachSymbol : table)
+    {
+        if (eachSymbol.second.stackNum[0] != 0)
+        // the symbol is not global
+        {
+            vector<int>::iterator canBeAccess = find(eachSymbol.second.stackNum.begin(), eachSymbol.second.stackNum.end(), lastStack);
+
+            // the input stack can access this symbol in last stack
+            if (canBeAccess != eachSymbol.second.stackNum.end())
+            {
+                eachSymbol.second.stackNum.push_back(currentStack);
+            }
+        }
+    }
 }
 
 void symbolTable::dump()
@@ -141,12 +161,35 @@ void symbolTable::dump()
         {
             cout << "array ";
         }
-        else 
+        else
             cout << "normal ";
 
-        cout << typeString[a.second.type] << "\t\t" << a.second.stackNum << endl;
-       
+        cout << typeString[a.second.type] << "\t\t";
+        for (auto s : a.second.stackNum)
+        {
+            cout << s << " ";
+        }
+        cout << endl;
     }
+}
+
+bool symbolTable::canAccess(const string &symbol, int currentScope)
+{
+    if (lookup(symbol) == 0)
+    {
+        cout << "ERROR: " << symbol << " undeclare" << endl;
+        return 0;
+    }
+    if (table[symbol].stackNum[0] == 0)
+    {
+        return 1;
+    }
+    vector<int>::iterator it = find(table[symbol].stackNum.begin(), table[symbol].stackNum.end(), currentScope);
+    if (it != table[symbol].stackNum.end())
+    {
+        return 1;
+    }
+    return 0;
 }
 
 dataType intToType(int number)

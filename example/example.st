@@ -9,10 +9,14 @@ var c: int
 % function declaration
 function add (a: int, b: int) : int
   var bbb:string
+  loop
+    var loopVar:real
+    bbb:="asdf"
+  end loop
   result a+b
 end add
 
- main block
+% main block
 c := add(a, 10)
 if (c > 10) then
   var aaa:int

@@ -142,6 +142,7 @@ when            {token(WHEN);}
 
 \"                      {
                                 // strcat(buf,"\"");
+                                strTemp[0]='\0';
                                 BEGIN(STRING_STATE);
                         }
 
@@ -155,9 +156,10 @@ when            {token(WHEN);}
 <STRING_STATE>\"        {
                         yytext=strTemp;
                         BEGIN(INITIAL);
+                        yylval.dType=type_string;
+                        // strcat(buf,"\"");
                         tokenString(STR,strTemp);
                         // LIST;
-                        // strcat(buf,"\"");
                         }
 
 <STRING_STATE>[^\"]*    {strcat(strTemp,yytext);}

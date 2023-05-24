@@ -10,7 +10,6 @@ void yyerror(char *);
 symbolTable s_table;
 int currentStack=0;
 int stackNumber=0;
-stack<int> scopeStack;
 
 typedef
 struct funcVar
@@ -22,6 +21,8 @@ struct funcVar
 }funcVar;
 
 vector<funcVar> functionVariable;
+stack<int> scopeStack;
+
 %}
 
 
@@ -83,7 +84,7 @@ constant:       CONST ID ':' Type ASSIGN expressions
                     if($4!=$6)
                         yyerror("ERROR: const assign type error");
                     else
-                         s_table.insert($2,intToType($4),is_constant,currentStack);
+                        s_table.insert($2,intToType($4),is_constant,currentStack);
                 }
                 
                 |CONST ID ASSIGN expressions
@@ -260,6 +261,7 @@ block:          BEG
                 {
                     scopeStack.push(currentStack);
                     currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 content
                 END     
@@ -279,17 +281,25 @@ block:          BEG
 simple:         ID ASSIGN expressions
                 {
                     if(s_table.lookup($1)==0)
+                    //symbol is not declare
                     {
                         printf("ERROR: %s not declare\n",$1);
                     }
                     else if(s_table.table[$1].masterType==is_constant)
+                    //symbol is constant
                     {
                         printf("ERROR %s is constant unable to assign\n",$1);
                     }
                     else if(s_table.table[$1].type!=$3)
+                    //type error
                     {
                         printf("ERROR: %s assign type error\n",$1);
                     }
+                    else if(s_table.canAccess($1,currentStack)==0)
+                    {
+                        printf("ERROR: %s is unable to access\n",$1);
+                    }   
+
                 }
                 |PUT expressions
                 |GET expressions
@@ -304,9 +314,9 @@ simple:         ID ASSIGN expressions
     //======================expression=====================
 expressions:    '-' expressions %prec NEGATIVE  
                 {
-                    if($2!=type_int||$2!=type_real)
+                    if($2!=type_int && $2!=type_real)
                     {
-                        yyerror("ERROR: unable to calculate negetive");
+                        printf("ERROR: %d unable to calculate negetive\n",$2);
                     }
                     $$=$2;
                 }
@@ -315,35 +325,30 @@ expressions:    '-' expressions %prec NEGATIVE
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '*' type error");
-                    else
-                        $$=$1;
+                    $$=$1;
                 }
                 |expressions '/' expressions
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '/' type error");
-                    else
-                        $$=$1;
+                    $$=$1;
                 }
                 |expressions MOD expressions{
                     if($1!=$3)
                         yyerror("ERROR: expression '%' type error");
-                    else
-                        $$=$1;
+                    $$=$1;
                 }
                 |expressions '+' expressions
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '+' type error");
-                    else
-                        $$=$1;
+                    $$=$1;
                 }
                 |expressions '-' expressions
                 {
                     if($1!=$3)
                         yyerror("ERROR: expression '-' type error");
-                    else
-                        $$=$1;
+                    $$=$1;
                 }
                 |bool_expression    {$$=$1;}
                 |const_exp          {$$=$1;}
@@ -352,9 +357,9 @@ expressions:    '-' expressions %prec NEGATIVE
                 {
                     if(s_table.lookup($1)==0)
                     {
-                        yyerror("ERROR: ID not found");
+                        printf("ERROR: ID %s not found\n",$1);
                     }
-                    else if(s_table.table[$1].stackNum!=0 && s_table.table[$1].stackNum!=currentStack)
+                    else if(s_table.canAccess($1,currentStack)==0)
                     {
                         printf("ERROR: %s is unable to reach\n",$1);
                     }
@@ -365,9 +370,9 @@ expressions:    '-' expressions %prec NEGATIVE
                 {
                     if(s_table.lookup($1)==0)
                     {
-                        yyerror("ERROR: ID not found");
+                        printf("ERROR: ID %s not found\n",$1);
                     }
-                    else if(s_table.table[$1].stackNum!=0 && s_table.table[$1].stackNum!=currentStack)
+                    else if(s_table.canAccess($1,currentStack)==0)
                     {
 
                         printf("ERROR: %s stack: %d is unable to reach\n",$1,currentStack);
@@ -477,6 +482,7 @@ conditional:    IF bool_expression THEN
                 {
                     scopeStack.push(currentStack);
                     currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 ELSE
@@ -497,6 +503,7 @@ conditional:    IF bool_expression THEN
                 {
                     scopeStack.push(currentStack);
                     currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 END IF
@@ -516,6 +523,8 @@ loop:           LOOP
                 {
                     scopeStack.push(currentStack);
                     currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
+
                 }
                 contents
                 END LOOP
@@ -542,6 +551,7 @@ loop:           LOOP
                     }
                     scopeStack.push(currentStack);
                     currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 END FOR
@@ -568,6 +578,7 @@ loop:           LOOP
                     }
                     scopeStack.push(currentStack);
                     currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 END FOR
