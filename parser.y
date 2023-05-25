@@ -257,10 +257,10 @@ content:        variable
 statment:       block
                 |simple
                 |expressions
-                |function_invocation
+                /* |function_invocation
                 {
                     functionVariable.clear();
-                }
+                } */
                 |conditional
                 |loop
                 ;
