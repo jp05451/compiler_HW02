@@ -258,6 +258,9 @@ statment:       block
                 |simple
                 |expressions
                 |function_invocation
+                {
+                    functionVariable.clear();
+                }
                 |conditional
                 |loop
                 ;
@@ -359,6 +362,9 @@ expressions:    '-' expressions %prec NEGATIVE
                 |bool_expression    {$$=$1;}
                 |const_exp          {$$=$1;}
                 |function_invocation
+                {
+                    functionVariable.clear();
+                }
                 |ID '[' INT ']'
                 {
                     if(s_table.lookup($1)==0)
