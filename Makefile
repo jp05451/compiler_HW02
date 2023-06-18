@@ -3,6 +3,9 @@
 #	Makefile -- P Parser
 #
 ##################################################################
+git:
+	git pull
+
 scanner: y.tab.cpp lex.yy.cpp
 	g++ -o parser y.tab.cpp -ll
 

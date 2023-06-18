@@ -2,7 +2,7 @@
 #include<string.h>
 #include "lex.yy.cpp"
 #include "symbolTable.hpp"
-
+#include <fstream>
 
 #define Trace(t)        printf(t)
 // int yylex();
@@ -21,6 +21,8 @@ int stackNumber=0;
 
 vector<funcVar> functionVariable;
 stack<int> scopeStack;
+
+fstream javaCode;
 
 %}
 
@@ -61,7 +63,11 @@ stack<int> scopeStack;
 
 %%
 
-program:        declarations statments;
+program:        declarations statments
+                {
+                    javaCode.open("aaa.")
+                }
+                ;
 
 declarations:   declarations declaration
                 |
